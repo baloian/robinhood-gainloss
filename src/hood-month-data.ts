@@ -1,6 +1,5 @@
-import { formatToUSD, numberToMonth } from '@baloian/lib-ts';
 import { HoodTradeTy, MetaDataTy } from '../types';
-import { dateToMonthYear } from './utils';
+import { dateToMonthYear, formatToUSD, numberToMonth } from './utils';
 import { printWithDots } from './print';
 
 

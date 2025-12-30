@@ -1,5 +1,6 @@
 import * as path from 'path';
-import { round, deepCopy } from '@baloian/lib-ts';
+import { round } from '@baloian/lib-ts';
+import { deepCopy } from './utils';
 import Validator from './validator';
 import Parser from './parser';
 import {

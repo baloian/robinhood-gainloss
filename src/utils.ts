@@ -136,3 +136,29 @@ export function getOrderedHoodMonthsData(rows: HoodTradeTy []): HoodMonthData[] 
   });
 }
 
+
+// Convert a number to a USD dollar value. For example,
+// formatToUSD(123459.87) -> $123,458.87
+export function formatToUSD(amount: number): string {
+  if (typeof amount !== 'number' || isNaN(amount)) return '';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+}
+
+
+// This method is simple and works well for plain objects that do not contain
+// functions or special types like Date, Set, Map,...
+export function deepCopy<T>(obj: T): T {
+  if (!obj) return obj;
+  return JSON.parse(JSON.stringify(obj));
+}
+
+export function numberToMonth(month: number): string {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return months[month - 1];
+}

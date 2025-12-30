@@ -1,7 +1,7 @@
-import { formatToUSD } from '@baloian/lib-ts';
 import { SymbolProfitTy, GainLossTy, HoodTradeTy } from '../types';
 import { HoodQueue } from './hood-queue';
 import { LinkedList } from 'typescript-ds-lib';
+import { formatToUSD } from './utils';
 
 
 export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
