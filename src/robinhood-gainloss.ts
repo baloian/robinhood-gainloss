@@ -22,7 +22,7 @@ import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
 
 
-export default class RobinhoodFIFO {
+export default class RobinhoodGainLoss {
   // Queue storing orders for each symbol using FIFO (First In, First Out) order.
   private hoodQueue: HoodQueue = new HoodQueue();
   private txsData: ClosingTrade[] = [];

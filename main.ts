@@ -1,4 +1,4 @@
-import RobinhoodFIFO from './src/robinhood-fifo';
+import RobinhoodGainLoss from './src/robinhood-gainloss';
 
 function abort(error?: Error | string, signame: NodeJS.Signals = 'SIGTERM'): never {
   if (error) {
@@ -19,6 +19,6 @@ function abort(error?: Error | string, signame: NodeJS.Signals = 'SIGTERM'): nev
  * This is the main entry point to the entire project.
  */
 (async () => {
-  const robinhoodFIFO = new RobinhoodFIFO();
-  await robinhoodFIFO.run();
+  const robinhoodGainLoss = new RobinhoodGainLoss();
+  await robinhoodGainLoss.run();
 })().catch(abort);

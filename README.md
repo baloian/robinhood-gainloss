@@ -3,14 +3,14 @@ This TypeScript library provides functionality to calculate [Robinhood](https://
 trading gains or losses using reports as input. We do this because Robinhood does not provide
 gains and losses in the monthly statements.
 
-**IMPORTANT:** The `robinhood-fifo` project DOES NOT generate tax forms of any kind. It helps you calculate gains
+**IMPORTANT:** The `robinhood-gainloss` project DOES NOT generate tax forms of any kind. It helps you calculate gains
 and losses.
 
 
 ## Build
 ```bash
-git clone git@github.com:baloian/robinhood-fifo.git
-cd robinhood-fifo
+git clone git@github.com:baloian/robinhood-gainloss.git
+cd robinhood-gainloss
 npm install
 ```
 
@@ -37,4 +37,4 @@ rules specified in `.eslintrc.json` file.
 
 ## License
 This source code is available to everyone under the standard
-[MIT LICENSE](https://github.com/baloian/alpaca-fifo/blob/master/LICENSE).
+[MIT LICENSE](https://github.com/baloian/alpaca-gainloss/blob/master/LICENSE).
