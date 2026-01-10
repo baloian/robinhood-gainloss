@@ -1,5 +1,5 @@
-import { round, pctDiff } from '@baloian/lib-ts';
 import { HoodTradeTy } from '../types';
+import { round, pctChange } from './utils';
 
 
 export interface ClosingTrade {
@@ -44,7 +44,7 @@ export class ClosingTrade implements ClosingTrade {
     this.buy_price = buyTrade.price;
     this.sell_price = sellTrade.price;
     this.profit = round(sellValue - buyValue);
-    this.profit_pct = pctDiff(sellValue, buyValue);
+    this.profit_pct = pctChange(sellValue, buyValue);
   }
 
   getHoldingTimeMs(): number {

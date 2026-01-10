@@ -23,7 +23,6 @@
     "url": "https://github.com/baloian/robinhood-fifo.git"
   },
   "dependencies": {
-    "@baloian/lib-ts": "github:baloian/lib-ts",
     "csv-parser": "^3.0.0",
     "fs": "^0.0.1-security",
     "ts-node": "^10.9.2",

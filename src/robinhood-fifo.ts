@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { round } from '@baloian/lib-ts';
 import { deepCopy } from './utils';
 import Validator from './validator';
 import Parser from './parser';
@@ -11,7 +10,8 @@ import {
 import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
-  getOrderedHoodMonthsData
+  getOrderedHoodMonthsData,
+  round
 } from './utils';
 import {
   printHoldings,

@@ -1,4 +1,4 @@
-import { round, pctDiff } from '@baloian/lib-ts';
+import { round, pctChange } from '../src/utils';
 import { ClosingTrade } from '../src/closing-trade';
 import { HoodTradeTy } from '../types';
 
@@ -41,7 +41,7 @@ describe('ClosingTrade', () => {
     expect(closingTrade.buy_process_date).toBe('1/15/2024');
     expect(closingTrade.sell_process_date).toBe('1/20/2024');
     expect(closingTrade.profit).toBe(round(sellValue - buyValue));
-    expect(closingTrade.profit_pct).toBeCloseTo(pctDiff(sellValue, buyValue));
+    expect(closingTrade.profit_pct).toBeCloseTo(pctChange(sellValue, buyValue));
   });
 
   test('getHoldingTimeMs returns correct time difference', () => {

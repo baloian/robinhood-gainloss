@@ -1,4 +1,3 @@
-import { round } from '@baloian/lib-ts';
 import {
   HoodTradeTy,
   GainLossTy,
@@ -6,6 +5,36 @@ import {
 } from '../types';
 import { HoodMonthData } from './hood-month-data';
 import { ClosingTrade } from './closing-trade';
+
+
+// The most common solutions for rounding to a decimal place is to either use
+// Number.prototype.toFixed(), or multiply the float by some power of 10 in order
+// to leverage Math.round(). Both of these work, except sometimes a decimal of 5
+// is rounded down instead of up.
+//
+// For example, Number((1.005).toFixed(2)); // 1 instead of 1.01
+//
+// The rounding problem can be avoided by using numbers represented in exponential
+// notation.
+//
+// For example, Number(Math.round(1.005+'e2')+'e-2'); // 1.01
+export function round(value: number, decimals: number = 2): number {
+  // Convert the value to exponential notation to handle precision correctly
+  const expStr = `${value}e${decimals}`;
+  const roundedExpStr = Math.round(Number(expStr));
+  const finalValueStr = `${roundedExpStr}e-${decimals}`;
+  return Number(finalValueStr);
+}
+
+
+// Function calculates percentage change of two values (current and previous).
+export function pctChange(newValue: number, oldValue: number): number {
+  if (oldValue === 0) throw new Error('Old value cannot be zero.');
+  // Percentage Change Formula:
+  // ((new_value - old_value) / |old_value|) x 100
+  const pctChange: number = ((newValue - oldValue) / Math.abs(oldValue)) * 100;
+  return round(pctChange);
+}
 
 
 /**
