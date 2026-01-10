@@ -13,7 +13,8 @@
     "prepare": "npm run build",
     "start": "tsc && NODE_ENV=${NODE_ENV-production} node dist/main.js",
     "dev": "tsc && NODE_ENV=${NODE_ENV-development} node dist/main.js",
-    "test": "rm -rf dist && tsc && jest"
+    "test": "rm -rf dist && tsc && jest",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "engines": {
     "node": ">=20.3.0"
@@ -25,6 +26,7 @@
   "dependencies": {
     "csv-parser": "^3.0.0",
     "fs": "^0.0.1-security",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript-ds-lib": "^0.4.0"
   },
@@ -34,9 +36,6 @@
     "@types/node": "^22.8.6",
     "@types/readable-stream": "^4.0.2",
     "@types/ws": "^8.5.5",
-    "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0",
-    "eslint": "^8.57.0",
     "ts-jest": "^29.2.5",
     "typescript": "^5.7.3"
   }
