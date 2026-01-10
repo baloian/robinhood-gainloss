@@ -1,7 +1,6 @@
 import { HoodTradeTy } from '../types';
 import { round, pctChange } from './utils';
 
-
 export interface ClosingTrade {
   symbol: string;
   buy_qty: number;
@@ -19,8 +18,7 @@ export interface ClosingTrade {
   getSymbol(): string;
   getInvestment(): number;
   getData(): ClosingTrade;
-};
-
+}
 
 export class ClosingTrade implements ClosingTrade {
   symbol: string;

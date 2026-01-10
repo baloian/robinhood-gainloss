@@ -11,19 +11,19 @@ describe('HoodMonthData', () => {
       symbol: 'AAPL',
       trans_code: 'Buy',
       quantity: 10,
-      price: 150.00,
-      amount: -1500.00,
+      price: 150.0,
+      amount: -1500.0,
       description: 'Market Buy'
     },
     {
       process_date: '3/16/2024',
-      activity_date: '3/16/2024', 
+      activity_date: '3/16/2024',
       settle_date: '3/18/2024',
       symbol: 'GOOGL',
       trans_code: 'Sell',
       quantity: 5,
-      price: 200.00,
-      amount: 1000.00,
+      price: 200.0,
+      amount: 1000.0,
       description: 'Market Sell'
     },
     {
@@ -33,8 +33,8 @@ describe('HoodMonthData', () => {
       symbol: 'MSFT',
       trans_code: 'Buy',
       quantity: 8,
-      price: 300.00,
-      amount: -2400.00,
+      price: 300.0,
+      amount: -2400.0,
       description: 'Market Buy'
     }
   ];
@@ -47,16 +47,16 @@ describe('HoodMonthData', () => {
 
     it('should throw error for invalid month/year formats', () => {
       const invalidFormats = [
-        '13/2024',    // Invalid month
-        '0/2024',     // Invalid month
-        '1/24',       // Invalid year
-        '1-2024',     // Wrong separator
-        '01/2024',    // Leading zero
-        'abc',        // Non-numeric
-        ''            // Empty string
+        '13/2024', // Invalid month
+        '0/2024', // Invalid month
+        '1/24', // Invalid year
+        '1-2024', // Wrong separator
+        '01/2024', // Leading zero
+        'abc', // Non-numeric
+        '' // Empty string
       ];
 
-      invalidFormats.forEach(format => {
+      invalidFormats.forEach((format) => {
         expect(() => new HoodMonthData(format, sampleData)).toThrow();
       });
     });
@@ -68,12 +68,12 @@ describe('HoodMonthData', () => {
     it('should return only current month buy/sell transactions', () => {
       const txs = instance.getBuySellTxs();
       expect(txs).toHaveLength(2);
-      expect(txs.map(tx => tx.symbol)).toEqual(['AAPL', 'GOOGL']);
+      expect(txs.map((tx) => tx.symbol)).toEqual(['AAPL', 'GOOGL']);
     });
 
     it('should exclude transactions from other months', () => {
       const txs = instance.getBuySellTxs();
-      expect(txs.find(tx => tx.symbol === 'MSFT')).toBeUndefined();
+      expect(txs.find((tx) => tx.symbol === 'MSFT')).toBeUndefined();
     });
   });
 
@@ -87,7 +87,7 @@ describe('HoodMonthData', () => {
         trans_code: 'GOLD',
         quantity: 0,
         price: 0,
-        amount: -5.00,
+        amount: -5.0,
         description: 'Gold subscription fee'
       },
       {
@@ -98,7 +98,7 @@ describe('HoodMonthData', () => {
         trans_code: 'CDIV',
         quantity: 0,
         price: 0,
-        amount: 10.50,
+        amount: 10.5,
         description: 'Dividend payment'
       },
       {
@@ -109,7 +109,7 @@ describe('HoodMonthData', () => {
         trans_code: 'ACH',
         quantity: 0,
         price: 0,
-        amount: 1000.00,
+        amount: 1000.0,
         description: 'ACH Deposit'
       },
       {
@@ -120,7 +120,7 @@ describe('HoodMonthData', () => {
         trans_code: 'ACH',
         quantity: 0,
         price: 0,
-        amount: -500.00,
+        amount: -500.0,
         description: 'ACH Withdrawal'
       },
       {
@@ -131,7 +131,7 @@ describe('HoodMonthData', () => {
         trans_code: 'CDIV',
         quantity: 0,
         price: 0,
-        amount: 15.00,
+        amount: 15.0,
         description: 'Dividend payment'
       }
     ];
@@ -141,10 +141,10 @@ describe('HoodMonthData', () => {
     it('should correctly aggregate metadata for current month', () => {
       const metadata = instance.getMetadata();
       expect(metadata).toEqual({
-        fees: -5.00,
-        dividend: 10.50,
-        deposit: 1000.00,
-        withdrawal: -500.00,
+        fees: -5.0,
+        dividend: 10.5,
+        deposit: 1000.0,
+        withdrawal: -500.0,
         interest: 0,
         benefit: 0,
         acats: 0
@@ -162,13 +162,13 @@ describe('HoodMonthData', () => {
           trans_code: 'GOLD',
           quantity: 0,
           price: 0,
-          amount: -5.00,
+          amount: -5.0,
           description: 'Another fee'
         }
       ];
       const instanceWithMultiple = new HoodMonthData('3/2024', multipleData);
       const metadata = instanceWithMultiple.getMetadata();
-      expect(metadata.fees).toBe(-10.00);
+      expect(metadata.fees).toBe(-10.0);
     });
   });
 });

@@ -2,25 +2,17 @@ import * as path from 'path';
 import { deepCopy } from './utils';
 import Validator from './validator';
 import Parser from './parser';
-import {
-  HoodTradeTy,
-  SymbolProfitTy,
-  GainLossTy
-} from '../types';
+import { HoodTradeTy, SymbolProfitTy, GainLossTy } from '../types';
 import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
   getOrderedHoodMonthsData,
   round
 } from './utils';
-import {
-  printHoldings,
-  printGainLoss
-} from './print';
+import { printHoldings, printGainLoss } from './print';
 import { HoodMonthData } from './hood-month-data';
 import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
-
 
 export default class RobinhoodGainLoss {
   // Queue storing orders for each symbol using FIFO (First In, First Out) order.
@@ -47,15 +39,21 @@ export default class RobinhoodGainLoss {
       printHoldings(this.hoodQueue);
       this.reset();
       this.processTrades(deepCopy(monthData.getData()));
-      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(this.txsData, monthData.getMonthYear());
-      const totalGainLoss: GainLossTy = calculateTotalGainLoss(this.txsData, monthData.getMonthYear());
+      const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(
+        this.txsData,
+        monthData.getMonthYear()
+      );
+      const totalGainLoss: GainLossTy = calculateTotalGainLoss(
+        this.txsData,
+        monthData.getMonthYear()
+      );
       printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n\n\n\n\n');
     });
   }
 
   private processTrades(rows: HoodTradeTy[]): void {
-    rows.forEach(trade => {
+    rows.forEach((trade) => {
       switch (trade.trans_code) {
         case 'Buy':
           this.hoodQueue.push(trade.symbol, { ...trade });
@@ -85,8 +83,8 @@ export default class RobinhoodGainLoss {
         const tmpBuyTrade: HoodTradeTy | undefined = this.hoodQueue.front(sellTrade.symbol);
         if (tmpBuyTrade) {
           const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
-          tmpSellTrade.quantity = sellTrade.quantity >= tmpBuyTrade.quantity ?
-            tmpBuyTrade.quantity : sellTrade.quantity;
+          tmpSellTrade.quantity =
+            sellTrade.quantity >= tmpBuyTrade.quantity ? tmpBuyTrade.quantity : sellTrade.quantity;
           tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
           this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
           sellTrade.quantity -= tmpSellTrade.quantity;
@@ -121,4 +119,3 @@ export default class RobinhoodGainLoss {
     this.txsData = [];
   }
 }
-

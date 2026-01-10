@@ -2,7 +2,6 @@ import { HoodTradeTy, MetaDataTy } from '../types';
 import { dateToMonthYear, formatToUSD, numberToMonth } from './utils';
 import { printWithDots } from './print';
 
-
 export interface HoodMonthData {
   monthYear: string;
   data: HoodTradeTy[];
@@ -16,10 +15,9 @@ export interface HoodMonthData {
   printHeadline(): void;
 }
 
-
 export class HoodMonthData implements HoodMonthData {
   monthYear: string;
-  /** 
+  /**
    * Contains both current month data and previous months' data.
    * Previous months' data is needed to calculate profit/loss
    * when trades span multiple months.
@@ -44,9 +42,11 @@ export class HoodMonthData implements HoodMonthData {
   }
 
   getBuySellTxs(): HoodTradeTy[] {
-    return this.data.filter(row =>
-      this.monthYear === dateToMonthYear(row.process_date) &&
-      (row.trans_code === 'Sell' || row.trans_code === 'Buy'));
+    return this.data.filter(
+      (row) =>
+        this.monthYear === dateToMonthYear(row.process_date) &&
+        (row.trans_code === 'Sell' || row.trans_code === 'Buy')
+    );
   }
 
   getMetadata(): MetaDataTy {
@@ -77,7 +77,7 @@ export class HoodMonthData implements HoodMonthData {
         if (row.description === 'ACH Deposit') md.deposit += row.amount;
         if (row.description === 'ACH Withdrawal') md.withdrawal += row.amount;
       }
-    })
+    });
     return md;
   }
 
@@ -97,13 +97,13 @@ export class HoodMonthData implements HoodMonthData {
     const txs: HoodTradeTy[] = this.getBuySellTxs();
     if (!txs.length) return;
     const headers = ['Trade Date', 'Symbol', 'Side', 'Qty', 'Price', 'Amount'];
-    const headerRow = headers.map(header => header.padEnd(10)).join(' | ');
+    const headerRow = headers.map((header) => header.padEnd(10)).join(' | ');
     const separator = headers.map(() => '----------').join('-|-');
 
     console.log(headerRow);
     console.log(separator);
 
-    txs.reverse().forEach(tx => {
+    txs.reverse().forEach((tx) => {
       const rowString = [
         tx.process_date.padEnd(10),
         tx.symbol.padEnd(10),

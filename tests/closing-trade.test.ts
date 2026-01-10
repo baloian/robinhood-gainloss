@@ -2,22 +2,21 @@ import { round, pctChange } from '../src/utils';
 import { ClosingTrade } from '../src/closing-trade';
 import { HoodTradeTy } from '../types';
 
-
 describe('ClosingTrade', () => {
   const buyTrade: HoodTradeTy = {
     symbol: 'AAPL',
     quantity: 10,
-    price: 150.50,
+    price: 150.5,
     process_date: '1/15/2024',
     activity_date: '1/15/2024',
     settle_date: '1/17/2024',
     description: 'Buy AAPL',
     trans_code: 'Buy',
-    amount: 1505.00
+    amount: 1505.0
   };
 
   const sellTrade: HoodTradeTy = {
-    symbol: 'AAPL', 
+    symbol: 'AAPL',
     quantity: 10,
     price: 165.75,
     process_date: '1/20/2024',
@@ -25,7 +24,7 @@ describe('ClosingTrade', () => {
     settle_date: '1/22/2024',
     description: 'Sell AAPL',
     trans_code: 'Sell',
-    amount: 1657.50
+    amount: 1657.5
   };
 
   const closingTrade = new ClosingTrade(buyTrade, sellTrade);
@@ -36,7 +35,7 @@ describe('ClosingTrade', () => {
     expect(closingTrade.symbol).toBe('AAPL');
     expect(closingTrade.buy_qty).toBe(10);
     expect(closingTrade.sell_qty).toBe(10);
-    expect(closingTrade.buy_price).toBe(150.50);
+    expect(closingTrade.buy_price).toBe(150.5);
     expect(closingTrade.sell_price).toBe(165.75);
     expect(closingTrade.buy_process_date).toBe('1/15/2024');
     expect(closingTrade.sell_process_date).toBe('1/20/2024');

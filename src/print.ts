@@ -3,7 +3,6 @@ import { HoodQueue } from './hood-queue';
 import { LinkedList } from 'typescript-ds-lib';
 import { formatToUSD } from './utils';
 
-
 export function printWithDots(value1: string, value2: string, symbol: string = '-'): void {
   const totalLength = 78;
   const totalValuesLength = value1.length + value2.length;
@@ -14,11 +13,10 @@ export function printWithDots(value1: string, value2: string, symbol: string = '
     return;
   }
   */
-  const line: string = `${value1} ${symbol.repeat(totalDots)}` +
-    (value2.length > 0 ? ` ${value2}` : symbol);
+  const line: string =
+    `${value1} ${symbol.repeat(totalDots)}` + (value2.length > 0 ? ` ${value2}` : symbol);
   console.log(line);
 }
-
 
 export function printHoldings(data: HoodQueue): void {
   if (data.size() === 0) return;
@@ -32,7 +30,6 @@ export function printHoldings(data: HoodQueue): void {
     }
   });
 }
-
 
 export function printGainLoss(data: SymbolProfitTy[], gainLoss: GainLossTy): void {
   console.log('');

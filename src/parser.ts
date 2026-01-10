@@ -3,15 +3,14 @@ import csv from 'csv-parser';
 import { HoodTradeTy } from '../types';
 import { convertToNumber, sortListsByLastProcessDate } from './utils';
 
-
-export default class Parser {  
-  static async parseCSV(filePath: string): Promise<HoodTradeTy []> {
+export default class Parser {
+  static async parseCSV(filePath: string): Promise<HoodTradeTy[]> {
     return new Promise((resolve, reject) => {
-      const results: HoodTradeTy [] = [];
+      const results: HoodTradeTy[] = [];
       fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (data) => {
-          const row: HoodTradeTy  = {
+          const row: HoodTradeTy = {
             activity_date: data['Activity Date'],
             process_date: data['Process Date'],
             settle_date: data['Settle Date'],
@@ -33,7 +32,7 @@ export default class Parser {
     });
   }
 
-  static async getRawData(dirPath: string): Promise<HoodTradeTy []> {
+  static async getRawData(dirPath: string): Promise<HoodTradeTy[]> {
     const listOfRows: HoodTradeTy[][] = [];
     const files = await fs.promises.readdir(dirPath);
     for (const filename of files) {

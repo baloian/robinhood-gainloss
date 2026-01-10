@@ -1,6 +1,5 @@
 import { dateToMonthYear } from '../src/utils';
 
-
 describe('dateToMonthYear', () => {
   test('converts MM/DD/YYYY to MM/YYYY format', () => {
     expect(dateToMonthYear('05/15/2024')).toBe('05/2024');

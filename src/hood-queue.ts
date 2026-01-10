@@ -1,9 +1,7 @@
 import { LinkedList } from 'typescript-ds-lib';
 import { HoodTradeTy } from '../types';
 
-
-type HoodQueueData = {[key: string]: LinkedList<HoodTradeTy>};
-
+type HoodQueueData = { [key: string]: LinkedList<HoodTradeTy> };
 
 export interface HoodQueue {
   push(symbol: string, trade: HoodTradeTy): void;
@@ -15,7 +13,6 @@ export interface HoodQueue {
   size(): number;
   isEmpty(symbol: string): boolean;
 }
-
 
 export class HoodQueue implements HoodQueue {
   private data: HoodQueueData = {};

@@ -77,7 +77,7 @@ describe('calculateTotalGainLoss', () => {
         trans_code: 'Sell',
         amount: 1120
       }
-    ),
+    )
   ];
 
   it('calculate short-term gains for a specific month', () => {
@@ -113,7 +113,7 @@ describe('calculateTotalGainLoss', () => {
           quantity: 3,
           price: 100,
           process_date: '6/1/2023',
-          activity_date: '6/1/2023', 
+          activity_date: '6/1/2023',
           settle_date: '6/3/2023',
           description: 'Buy TSLA',
           trans_code: 'Buy',
@@ -121,11 +121,11 @@ describe('calculateTotalGainLoss', () => {
         },
         {
           symbol: 'TSLA',
-          quantity: 3, 
+          quantity: 3,
           price: 90,
           process_date: '7/1/2023',
           activity_date: '7/1/2023',
-          settle_date: '7/3/2023', 
+          settle_date: '7/3/2023',
           description: 'Sell TSLA',
           trans_code: 'Sell',
           amount: 270

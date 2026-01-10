@@ -1,6 +1,5 @@
 import { convertToNumber } from '../src/utils';
 
-
 describe('convertToNumber', () => {
   test('converts positive number in $123 format to number', () => {
     expect(convertToNumber('$123')).toBe(123);
