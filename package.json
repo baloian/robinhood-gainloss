@@ -1,6 +1,6 @@
 {
   "name": "robinhood-gainloss",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Robinhood Trading Gain/Loss Calculator",
   "author": "Artiom Baloian <artiom.baloian@gmail.com>",
   "main": "dist/robinhood-gainloss.js",
@@ -24,19 +24,15 @@
     "url": "https://github.com/baloian/robinhood-gainloss.git"
   },
   "dependencies": {
-    "csv-parser": "^3.0.0",
+    "csv-parser": "^3.2.1",
     "fs": "^0.0.1-security",
-    "prettier": "^3.6.2",
-    "ts-node": "^10.9.2",
-    "typescript-ds-lib": "^0.4.0"
+    "typescript-ds-lib": "^0.4.9"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/msgpack5": "^3.4.3",
-    "@types/node": "^22.8.6",
-    "@types/readable-stream": "^4.0.2",
-    "@types/ws": "^8.5.5",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.9.1",
+    "prettier": "^3.8.3",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.7.3"
+    "typescript": "^6.0.3"
   }
 }
