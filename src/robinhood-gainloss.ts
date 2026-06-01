@@ -103,6 +103,10 @@ export default class RobinhoodGainLoss {
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.hoodQueue, sellTrade.symbol, sellTrade.quantity);
     if (v) {
+      if (this.hoodQueue.isEmpty(sellTrade.symbol)) {
+        console.warn(`Warning: ${v}`);
+        return;
+      }
       console.error(v);
       throw new Error(v);
     }
