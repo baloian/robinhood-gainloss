@@ -21,11 +21,12 @@ npm install
 ```text
 robinhood-gainloss/
   input/
-    2024-01.csv
-    2024-02.csv
+    1.csv
+    2.csv
+    3.csv
 ```
 
-Only files ending in `.csv` are read. You can use a single file or multiple files; all rows are merged and sorted by process date before calculations run.
+Name each CSV with a number in chronological order (`1.csv` for the earliest export, `2.csv` for the next, and so on). Files are read in numeric order (`1`, `2`, … `10`, not `1`, `10`, `2`). Only files ending in `.csv` are read. You can use a single file or multiple files; all rows are merged and sorted by process date before calculations run.
 
 ## Run
 

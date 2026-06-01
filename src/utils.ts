@@ -1,3 +1,4 @@
+import path from 'path';
 import { HoodTradeTy, GainLossTy, SymbolProfitTy } from '../types';
 import { HoodMonthData } from './hood-month-data';
 import { ClosingTrade } from './closing-trade';
@@ -98,6 +99,20 @@ export function isMonthYearLessOrEqual(date1: string, date2: string): boolean {
   const [month2, year2] = m2.split('/').map(Number);
   if (year1 !== year2) return year1 <= year2;
   return month1 <= month2;
+}
+
+export function csvFileNumericSortKey(filePath: string): number {
+  const baseName = path.basename(filePath, path.extname(filePath));
+  if (!/^\d+$/.test(baseName)) {
+    throw new Error(
+      `CSV filename must be a number (e.g. 1.csv), got: ${path.basename(filePath)}`
+    );
+  }
+  return Number(baseName);
+}
+
+export function sortCsvFilesByNumericName(filePaths: string[]): string[] {
+  return [...filePaths].sort((a, b) => csvFileNumericSortKey(a) - csvFileNumericSortKey(b));
 }
 
 export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {

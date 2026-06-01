@@ -2,7 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
 import { HoodTradeTy } from '../types';
-import { convertToNumber, sortTradesByProcessDate, validateHoodTrade } from './utils';
+import {
+  convertToNumber,
+  sortCsvFilesByNumericName,
+  sortTradesByProcessDate,
+  validateHoodTrade
+} from './utils';
 
 export default class Parser {
   static async parseCSV(filePath: string): Promise<HoodTradeTy[]> {
@@ -42,10 +47,10 @@ export default class Parser {
 
   static async getRawData(dirPath: string): Promise<HoodTradeTy[]> {
     const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
-    const csvFiles = entries
+    const csvFilePaths = entries
       .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.csv'))
-      .map((entry) => path.join(dirPath, entry.name))
-      .sort();
+      .map((entry) => path.join(dirPath, entry.name));
+    const csvFiles = sortCsvFilesByNumericName(csvFilePaths);
 
     if (csvFiles.length === 0) {
       throw new Error(`No CSV files found in ${dirPath}`);
