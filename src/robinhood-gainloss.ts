@@ -7,6 +7,7 @@ import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
   getOrderedHoodMonthsData,
+  dateToMonthYear,
   round,
   isQtyZero,
   isQtyGreater,
@@ -38,6 +39,8 @@ export default class RobinhoodGainLoss {
   private txsData: ClosingTrade[] = [];
   private readonly inputDir: string;
   private warnedTransCodes = new Set<string>();
+  private statementMonthYear: string = '';
+  private warnedUnmatchedSells = new Set<string>();
 
   constructor(inputDir?: string) {
     this.inputDir =
@@ -53,6 +56,7 @@ export default class RobinhoodGainLoss {
     const hoodMonthsData: HoodMonthData[] = getOrderedHoodMonthsData(rows);
     hoodMonthsData.forEach((monthData: HoodMonthData) => {
       this.reset();
+      this.statementMonthYear = monthData.getMonthYear();
       monthData.printHeadline();
       monthData.printBuySellTxs();
       monthData.printMetadata();
@@ -100,11 +104,23 @@ export default class RobinhoodGainLoss {
     );
   }
 
+  private unmatchedSellKey(sellTrade: HoodTradeTy): string {
+    return `${sellTrade.symbol}|${sellTrade.process_date}|${sellTrade.quantity}`;
+  }
+
+  private warnUnmatchedSell(sellTrade: HoodTradeTy, message: string): void {
+    if (dateToMonthYear(sellTrade.process_date) !== this.statementMonthYear) return;
+    const key = this.unmatchedSellKey(sellTrade);
+    if (this.warnedUnmatchedSells.has(key)) return;
+    this.warnedUnmatchedSells.add(key);
+    console.warn(`Warning: ${message}`);
+  }
+
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.hoodQueue, sellTrade.symbol, sellTrade.quantity);
     if (v) {
       if (this.hoodQueue.isEmpty(sellTrade.symbol)) {
-        console.warn(`Warning: ${v}`);
+        this.warnUnmatchedSell(sellTrade, v);
         return;
       }
       console.error(v);
@@ -154,5 +170,6 @@ export default class RobinhoodGainLoss {
   private reset() {
     this.hoodQueue = new HoodQueue();
     this.txsData = [];
+    this.warnedUnmatchedSells.clear();
   }
 }
