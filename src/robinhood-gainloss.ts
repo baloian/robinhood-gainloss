@@ -7,25 +7,46 @@ import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
   getOrderedHoodMonthsData,
-  round
+  round,
+  isQtyZero,
+  isQtyGreater,
+  isQtyGreaterOrEqual,
+  quantitiesEqual
 } from './utils';
 import { printHoldings, printGainLoss } from './print';
 import { HoodMonthData } from './hood-month-data';
 import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
 
+const UNHANDLED_TRANS_CODES = new Set([
+  'Buy',
+  'Sell',
+  '',
+  'GOLD',
+  'MINT',
+  'CDIV',
+  'MDIV',
+  'INT',
+  'ACATI',
+  'GDBP',
+  'T/A',
+  'ACH'
+]);
+
 export default class RobinhoodGainLoss {
-  // Queue storing orders for each symbol using FIFO (First In, First Out) order.
   private hoodQueue: HoodQueue = new HoodQueue();
   private txsData: ClosingTrade[] = [];
+  private readonly inputDir: string;
+  private warnedTransCodes = new Set<string>();
+
+  constructor(inputDir?: string) {
+    this.inputDir =
+      inputDir ?? path.resolve(__dirname, '../../input');
+  }
 
   async run(): Promise<void> {
-    try {
-      const rows: HoodTradeTy[] = await Parser.getRawData(path.resolve(__dirname, '../../input'));
-      this.processMonthlyStmts(rows);
-    } catch (error) {
-      console.error(error);
-    }
+    const rows: HoodTradeTy[] = await Parser.getRawData(this.inputDir);
+    this.processMonthlyStmts(rows);
   }
 
   private processMonthlyStmts(rows: HoodTradeTy[]): void {
@@ -62,29 +83,44 @@ export default class RobinhoodGainLoss {
           this.processSellTrade(trade);
           break;
         default:
+          this.warnUnhandledTransCode(trade.trans_code);
           break;
       }
     });
   }
 
+  private warnUnhandledTransCode(transCode: string): void {
+    if (!transCode || UNHANDLED_TRANS_CODES.has(transCode) || this.warnedTransCodes.has(transCode)) {
+      return;
+    }
+    this.warnedTransCodes.add(transCode);
+    console.warn(
+      `Warning: unsupported trans code "${transCode}" (e.g. splits, options). ` +
+        'Buy/Sell FIFO matching may be incorrect for affected symbols.'
+    );
+  }
+
   private processSellTrade(sellTrade: HoodTradeTy): void {
     const v = Validator.verifySell(this.hoodQueue, sellTrade.symbol, sellTrade.quantity);
-    if (v) return;
+    if (v) {
+      console.error(v);
+      throw new Error(v);
+    }
     const buyTrade: HoodTradeTy | undefined = this.hoodQueue.front(sellTrade.symbol);
     if (!buyTrade) return;
-    if (buyTrade.quantity - sellTrade.quantity === 0 || buyTrade.quantity - sellTrade.quantity > 0) {
+    if (
+      quantitiesEqual(buyTrade.quantity, sellTrade.quantity) ||
+      isQtyGreater(buyTrade.quantity, sellTrade.quantity)
+    ) {
       this.sellFullOrPartially(buyTrade, sellTrade);
     } else {
-      // This is when selling more than the current buy order.
-      // For example, buying 5 APPL, and then buying 4 more APPL, and then selling 7 APPL.
-      // In this case, the current buying order is the 5 AAPL. I would need to sell 2 more
-      // AAPL from the 4 AAPL buy.
-      while (sellTrade.quantity > 0) {
+      while (!isQtyZero(sellTrade.quantity)) {
         const tmpBuyTrade: HoodTradeTy | undefined = this.hoodQueue.front(sellTrade.symbol);
         if (tmpBuyTrade) {
           const tmpSellTrade: HoodTradeTy = deepCopy(sellTrade);
-          tmpSellTrade.quantity =
-            sellTrade.quantity >= tmpBuyTrade.quantity ? tmpBuyTrade.quantity : sellTrade.quantity;
+          tmpSellTrade.quantity = isQtyGreaterOrEqual(sellTrade.quantity, tmpBuyTrade.quantity)
+            ? tmpBuyTrade.quantity
+            : sellTrade.quantity;
           tmpSellTrade.amount = round(tmpSellTrade.quantity * tmpSellTrade.price);
           this.sellFullOrPartially(tmpBuyTrade, tmpSellTrade);
           sellTrade.quantity -= tmpSellTrade.quantity;
@@ -97,18 +133,15 @@ export default class RobinhoodGainLoss {
     }
   }
 
-  // This is when selling the entire order. For example, buying 5 APPL and then selling 5 APPL.
-  // OR when selling less than bought. For example, buying 5 APPL and then selling 3 APPL.
   private sellFullOrPartially(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy): void {
-    if (buyTrade.quantity - sellTrade.quantity === 0) {
+    if (quantitiesEqual(buyTrade.quantity, sellTrade.quantity)) {
       this.txsData.push(new ClosingTrade(buyTrade, sellTrade));
       this.hoodQueue.pop(sellTrade.symbol);
-    } else if (buyTrade.quantity - sellTrade.quantity > 0) {
+    } else if (isQtyGreater(buyTrade.quantity, sellTrade.quantity)) {
       const tmpBuyTrade: HoodTradeTy = deepCopy(buyTrade);
       tmpBuyTrade.quantity = sellTrade.quantity;
       tmpBuyTrade.amount = round(tmpBuyTrade.quantity * tmpBuyTrade.price);
       this.txsData.push(new ClosingTrade(tmpBuyTrade, sellTrade));
-      // This would be the remaining part (not sold yet).
       buyTrade.quantity -= sellTrade.quantity;
       buyTrade.amount = round(buyTrade.quantity * buyTrade.price);
     }

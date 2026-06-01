@@ -2,105 +2,181 @@ import { HoodTradeTy, GainLossTy, SymbolProfitTy } from '../types';
 import { HoodMonthData } from './hood-month-data';
 import { ClosingTrade } from './closing-trade';
 
+export const QTY_EPSILON = 1e-8;
+
+export function isQtyZero(qty: number): boolean {
+  return Math.abs(qty) < QTY_EPSILON;
+}
+
+export function quantitiesEqual(a: number, b: number): boolean {
+  return Math.abs(a - b) < QTY_EPSILON;
+}
+
+export function isQtyGreater(a: number, b: number): boolean {
+  return a - b > QTY_EPSILON;
+}
+
+export function isQtyGreaterOrEqual(a: number, b: number): boolean {
+  return a - b >= -QTY_EPSILON;
+}
+
 // The most common solutions for rounding to a decimal place is to either use
 // Number.prototype.toFixed(), or multiply the float by some power of 10 in order
 // to leverage Math.round(). Both of these work, except sometimes a decimal of 5
 // is rounded down instead of up.
-//
-// For example, Number((1.005).toFixed(2)); // 1 instead of 1.01
-//
-// The rounding problem can be avoided by using numbers represented in exponential
-// notation.
-//
-// For example, Number(Math.round(1.005+'e2')+'e-2'); // 1.01
 export function round(value: number, decimals: number = 2): number {
-  // Convert the value to exponential notation to handle precision correctly
   const expStr = `${value}e${decimals}`;
   const roundedExpStr = Math.round(Number(expStr));
   const finalValueStr = `${roundedExpStr}e-${decimals}`;
   return Number(finalValueStr);
 }
 
-// Function calculates percentage change of two values (current and previous).
 export function pctChange(newValue: number, oldValue: number): number {
   if (oldValue === 0) throw new Error('Old value cannot be zero.');
-  // Percentage Change Formula:
-  // ((new_value - old_value) / |old_value|) x 100
   const pctChange: number = ((newValue - oldValue) / Math.abs(oldValue)) * 100;
   return round(pctChange);
 }
 
 /**
- * Converts a string value from CSV file format ($NUMBER) to the numberic value.
- * CSV files contain currency values with dollar signs and parentheses.
- * e.g. ($123.45) to $123.45.
+ * Converts a string value from CSV file format to a number.
+ * Supports $123, ($123.45) accounting negatives, and (-$123).
  */
 export function convertToNumber(value: string): number {
-  const cleanedValue = value.replace(/[\$,()]/g, '');
-  return parseFloat(cleanedValue);
+  const trimmed = value.trim();
+  if (!trimmed) return NaN;
+  const accountingNegative = trimmed.startsWith('(') && trimmed.endsWith(')');
+  const cleanedValue = trimmed.replace(/[\$,()]/g, '');
+  const num = parseFloat(cleanedValue);
+  if (isNaN(num)) return NaN;
+  if (accountingNegative && num > 0) return -num;
+  return num;
 }
 
 /**
- * Compares two dates in MM/YYYY format and determines if the first date is less than or equal to the second date.
- * date1 - First date in MM/YYYY format (e.g., "03/2024")
- * date2 - Second date in MM/YYYY format (e.g., "04/2024")
- * Returns True if date1 is less than or equal to date2, false otherwise.
- * Throws Error if dates are not in valid MM/YYYY format.
+ * Parses Robinhood MM/DD/YYYY dates in local calendar time (no locale ambiguity).
  */
-export function isMonthYearLessOrEqual(date1: string, date2: string): boolean {
-  const regex = /^(0?[1-9]|1[0-2])\/\d{4}$/;
-  if (!regex.test(date1) || !regex.test(date2)) {
-    throw new Error('Invalid date format. Expected format is MM/YYYY');
+export function parseRobinhoodDate(dateString: string): Date {
+  const trimmed = dateString.trim();
+  const regex = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/;
+  const match = trimmed.match(regex);
+  if (!match) {
+    throw new Error(`Invalid date format: ${dateString}. Expected format is MM/DD/YYYY.`);
   }
-  const [month1, year1] = date1.split('/').map(Number);
-  const [month2, year2] = date2.split('/').map(Number);
+  const month = Number(match[1]) - 1;
+  const day = Number(match[2]);
+  const year = Number(match[3]);
+  return new Date(year, month, day);
+}
+
+/**
+ * Long-term capital gain: sell date is strictly after the one-year anniversary of the buy date.
+ */
+export function isLongTermCapitalGain(buyDateString: string, sellDateString: string): boolean {
+  const buyDate = parseRobinhoodDate(buyDateString);
+  const sellDate = parseRobinhoodDate(sellDateString);
+  const anniversary = new Date(buyDate);
+  anniversary.setFullYear(anniversary.getFullYear() + 1);
+  return sellDate.getTime() > anniversary.getTime();
+}
+
+/**
+ * Normalizes MM/YYYY to M/YYYY (no leading zeros on month).
+ */
+export function normalizeMonthYear(monthYear: string): string {
+  const regex = /^(0?[1-9]|1[0-2])\/(\d{4})$/;
+  if (!regex.test(monthYear.trim())) {
+    throw new Error(`Invalid month/year format: ${monthYear}. Expected format is MM/YYYY.`);
+  }
+  const [month, year] = monthYear.trim().split('/').map(Number);
+  return `${month}/${year}`;
+}
+
+export function isMonthYearLessOrEqual(date1: string, date2: string): boolean {
+  const m1 = normalizeMonthYear(date1);
+  const m2 = normalizeMonthYear(date2);
+  const [month1, year1] = m1.split('/').map(Number);
+  const [month2, year2] = m2.split('/').map(Number);
   if (year1 !== year2) return year1 <= year2;
   return month1 <= month2;
 }
 
-/**
- * When processing multiple CSV files, this function ensures that data is ordered based on process date.
- * This is crucial for maintaining the correct activity order across all input files.
- */
+export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
+  return [...rows].sort((a, b) => {
+    const dateDiff =
+      parseRobinhoodDate(a.process_date).getTime() - parseRobinhoodDate(b.process_date).getTime();
+    if (dateDiff !== 0) return dateDiff;
+    const activityDiff =
+      parseRobinhoodDate(a.activity_date || a.process_date).getTime() -
+      parseRobinhoodDate(b.activity_date || b.process_date).getTime();
+    return activityDiff;
+  });
+}
+
+/** @deprecated Use sortTradesByProcessDate on a flat merged list. */
 export function sortListsByLastProcessDate(lists: HoodTradeTy[][]): HoodTradeTy[] {
-  const sortedLists: HoodTradeTy[][] = lists
-    .filter((subList) => subList.length > 0)
-    .sort((a, b) => {
-      const dateA = new Date(a[a.length - 1].process_date).getTime();
-      const dateB = new Date(b[b.length - 1].process_date).getTime();
-      return dateA - dateB;
-    });
-  return sortedLists.flatMap((subList) => subList);
+  return sortTradesByProcessDate(lists.flat());
 }
 
 export function dateToMonthYear(dateString: string): string {
-  // Regular expression to match MM/DD/YYYY format
   dateString = dateString.trim();
   const regex = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
   if (!regex.test(dateString)) {
     throw new Error(`Invalid date format: ${dateString}. Expected format is MM/DD/YYYY.`);
   }
   const parts: string[] = dateString.split('/');
-  return `${parts[0]}/${parts[2]}`;
+  return normalizeMonthYear(`${parts[0]}/${parts[2]}`);
+}
+
+/**
+ * Proportional cash amount for a partial lot (uses CSV amount when present, includes fees).
+ */
+export function proportionalAmount(trade: HoodTradeTy, qty: number): number {
+  if (trade.quantity && !isNaN(trade.amount) && trade.amount !== 0) {
+    let amt = round(trade.amount * (qty / trade.quantity));
+    // Robinhood uses negative amounts for buys; normalize if CSV has positive cost.
+    if (trade.trans_code === 'Buy' && amt > 0) amt = -amt;
+    if (trade.trans_code === 'Sell' && amt < 0) amt = -amt;
+    return amt;
+  }
+  const sign = trade.trans_code === 'Buy' ? -1 : 1;
+  return round(sign * trade.price * qty);
+}
+
+export function validateHoodTrade(row: HoodTradeTy, source: string): void {
+  if (row.trans_code !== 'Buy' && row.trans_code !== 'Sell') return;
+  if (!row.symbol) {
+    throw new Error(`${source}: ${row.trans_code} row is missing symbol (${row.process_date}).`);
+  }
+  if (isNaN(row.quantity) || row.quantity <= 0) {
+    throw new Error(
+      `${source}: invalid quantity for ${row.symbol} ${row.trans_code} on ${row.process_date}.`
+    );
+  }
+  if (isNaN(row.price) || row.price < 0) {
+    throw new Error(
+      `${source}: invalid price for ${row.symbol} ${row.trans_code} on ${row.process_date}.`
+    );
+  }
 }
 
 export function getTradesByMonth(rows: HoodTradeTy[], month: string): HoodTradeTy[] {
+  const normalizedMonth = normalizeMonthYear(month);
   return rows.filter(
-    (row) => row.process_date && isMonthYearLessOrEqual(dateToMonthYear(row.process_date), month)
+    (row) =>
+      row.process_date &&
+      isMonthYearLessOrEqual(dateToMonthYear(row.process_date), normalizedMonth)
   );
 }
 
 export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string): GainLossTy {
-  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === monthYear);
+  const normalizedMonth = normalizeMonthYear(monthYear);
+  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === normalizedMonth);
   const profitSummary: GainLossTy = {
     long_term_profit: 0,
     short_term_profit: 0
   };
-  const MS_PER_DAY = 24 * 60 * 60 * 1000;
-  const DAYS_PER_YEAR = 365;
-  const ONE_YEAR_MS = DAYS_PER_YEAR * MS_PER_DAY;
   trades.forEach((trade: ClosingTrade) => {
-    if (trade.getHoldingTimeMs() > ONE_YEAR_MS) {
+    if (trade.isLongTerm()) {
       profitSummary.long_term_profit += trade.profit;
     } else {
       profitSummary.short_term_profit += trade.profit;
@@ -113,25 +189,25 @@ export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string):
 }
 
 export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string): SymbolProfitTy[] {
-  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === monthYear);
-  const result: { [key: string]: { total_profit: number; total_profit_pct: number } } = {};
+  const normalizedMonth = normalizeMonthYear(monthYear);
+  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === normalizedMonth);
+  const result: { [key: string]: { total_profit: number; total_investment: number } } = {};
   trades.forEach((trade: ClosingTrade) => {
-    const investment = trade.getInvestment();
-    if (!result[trade.getSymbol()])
-      result[trade.getSymbol()] = { total_profit: 0, total_profit_pct: 0 };
-    const symbolData = result[trade.getSymbol()];
-    symbolData.total_profit += trade.getProfit();
-    const totalInvestment = symbolData.total_profit_pct * symbolData.total_profit + investment;
-    symbolData.total_profit_pct =
-      (symbolData.total_profit_pct * (totalInvestment - investment) +
-        trade.getProfitPct() * investment) /
-      totalInvestment;
+    const symbol = trade.getSymbol();
+    if (!result[symbol]) result[symbol] = { total_profit: 0, total_investment: 0 };
+    result[symbol].total_profit += trade.getProfit();
+    result[symbol].total_investment += trade.getInvestment();
   });
-  return Object.keys(result).map((symbol) => ({
-    symbol: symbol,
-    total_profit: round(result[symbol].total_profit),
-    total_profit_pct: round(result[symbol].total_profit_pct)
-  }));
+  return Object.keys(result).map((symbol) => {
+    const { total_profit, total_investment } = result[symbol];
+    const total_profit_pct =
+      total_investment === 0 ? 0 : round((total_profit / total_investment) * 100);
+    return {
+      symbol,
+      total_profit: round(total_profit),
+      total_profit_pct
+    };
+  });
 }
 
 export function getOrderedHoodMonthsData(rows: HoodTradeTy[]): HoodMonthData[] {
@@ -152,8 +228,6 @@ export function getOrderedHoodMonthsData(rows: HoodTradeTy[]): HoodMonthData[] {
   });
 }
 
-// Convert a number to a USD dollar value. For example,
-// formatToUSD(123459.87) -> $123,458.87
 export function formatToUSD(amount: number): string {
   if (typeof amount !== 'number' || isNaN(amount)) return '';
   return new Intl.NumberFormat('en-US', {
@@ -162,8 +236,6 @@ export function formatToUSD(amount: number): string {
   }).format(amount);
 }
 
-// This method is simple and works well for plain objects that do not contain
-// functions or special types like Date, Set, Map,...
 export function deepCopy<T>(obj: T): T {
   if (!obj) return obj;
   return JSON.parse(JSON.stringify(obj));

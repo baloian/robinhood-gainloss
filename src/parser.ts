@@ -1,7 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 import csv from 'csv-parser';
 import { HoodTradeTy } from '../types';
-import { convertToNumber, sortListsByLastProcessDate } from './utils';
+import { convertToNumber, sortTradesByProcessDate, validateHoodTrade } from './utils';
 
 export default class Parser {
   static async parseCSV(filePath: string): Promise<HoodTradeTy[]> {
@@ -21,25 +22,39 @@ export default class Parser {
             price: convertToNumber(data['Price'] || ''),
             amount: convertToNumber(data['Amount'] || '')
           };
-          if (row.process_date) results.push(row);
+          if (!row.process_date) return;
+          try {
+            validateHoodTrade(row, filePath);
+          } catch (err) {
+            reject(err);
+            return;
+          }
+          results.push(row);
         })
         .on('end', () => {
-          resolve(results.reverse());
+          resolve(results);
         })
-        .on('error', (error: any) => {
+        .on('error', (error: Error) => {
           reject(error);
         });
     });
   }
 
   static async getRawData(dirPath: string): Promise<HoodTradeTy[]> {
-    const listOfRows: HoodTradeTy[][] = [];
-    const files = await fs.promises.readdir(dirPath);
-    for (const filename of files) {
-      listOfRows.push(await Parser.parseCSV(`${dirPath}/${filename}`));
+    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    const csvFiles = entries
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.csv'))
+      .map((entry) => path.join(dirPath, entry.name))
+      .sort();
+
+    if (csvFiles.length === 0) {
+      throw new Error(`No CSV files found in ${dirPath}`);
     }
-    // To merge all the ordered sub-lists into one list without altering the original
-    // order within each sub-list.
-    return sortListsByLastProcessDate(listOfRows);
+
+    const allRows: HoodTradeTy[] = [];
+    for (const filePath of csvFiles) {
+      allRows.push(...(await Parser.parseCSV(filePath)));
+    }
+    return sortTradesByProcessDate(allRows);
   }
 }

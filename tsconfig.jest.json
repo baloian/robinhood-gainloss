@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["jest", "node"],
+    "lib": ["ES2022"],
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["tests/**/*.ts", "src/**/*.ts", "types/**/*.ts"]
+}

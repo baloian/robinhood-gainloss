@@ -9,12 +9,16 @@ describe('convertToNumber', () => {
     expect(convertToNumber('$1,234')).toBe(1234);
   });
 
-  test('converts negative number in ($123) format to number', () => {
+  test('converts accounting negative in ($123.45) format', () => {
+    expect(convertToNumber('($123.45)')).toBe(-123.45);
+  });
+
+  test('converts negative number in (-$123) format to number', () => {
     expect(convertToNumber('(-$123)')).toBe(-123);
   });
 
   test('converts negative number with comma in ($1,234) format to number', () => {
-    expect(convertToNumber('(-$1,234)')).toBe(-1234);
+    expect(convertToNumber('($1,234)')).toBe(-1234);
   });
 
   test('returns 0 for input $0', () => {
@@ -34,6 +38,6 @@ describe('convertToNumber', () => {
   });
 
   test('converts large negative number with comma in ($1,000,000) format to number', () => {
-    expect(convertToNumber('(-$1,000,000)')).toBe(-1000000);
+    expect(convertToNumber('($1,000,000)')).toBe(-1000000);
   });
 });

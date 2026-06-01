@@ -1,5 +1,5 @@
 import { HoodTradeTy, MetaDataTy } from '../types';
-import { dateToMonthYear, formatToUSD, numberToMonth } from './utils';
+import { dateToMonthYear, formatToUSD, normalizeMonthYear, numberToMonth } from './utils';
 import { printWithDots } from './print';
 
 export interface HoodMonthData {
@@ -25,11 +25,7 @@ export class HoodMonthData implements HoodMonthData {
   data: HoodTradeTy[];
 
   constructor(monthYear: string, data: HoodTradeTy[]) {
-    const regex = /^([1-9]|1[0-2])\/\d{4}$/;
-    if (!regex.test(monthYear)) {
-      throw new Error(`Invalid month/year format: ${monthYear}. Expected format is MM/YYYY.`);
-    }
-    this.monthYear = monthYear;
+    this.monthYear = normalizeMonthYear(monthYear);
     this.data = data;
   }
 
@@ -64,6 +60,7 @@ export class HoodMonthData implements HoodMonthData {
       MINT: 'fees',
       CDIV: 'dividend',
       MDIV: 'dividend',
+      INT: 'interest',
       ACATI: 'acats',
       GDBP: 'benefit',
       'T/A': 'benefit'
@@ -74,8 +71,9 @@ export class HoodMonthData implements HoodMonthData {
       if (property) {
         md[property] += row.amount;
       } else if (row.trans_code === 'ACH') {
-        if (row.description === 'ACH Deposit') md.deposit += row.amount;
-        if (row.description === 'ACH Withdrawal') md.withdrawal += row.amount;
+        const desc = (row.description || '').toLowerCase();
+        if (desc.includes('deposit')) md.deposit += row.amount;
+        else if (desc.includes('withdrawal')) md.withdrawal += row.amount;
       }
     });
     return md;

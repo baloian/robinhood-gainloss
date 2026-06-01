@@ -2,7 +2,6 @@ import { HoodMonthData } from '../src/hood-month-data';
 import { HoodTradeTy } from '../types';
 
 describe('HoodMonthData', () => {
-  // Test data setup
   const sampleData: HoodTradeTy[] = [
     {
       process_date: '3/15/2024',
@@ -27,7 +26,7 @@ describe('HoodMonthData', () => {
       description: 'Market Sell'
     },
     {
-      process_date: '2/28/2024', // Previous month
+      process_date: '2/28/2024',
       activity_date: '2/28/2024',
       settle_date: '3/1/2024',
       symbol: 'MSFT',
@@ -43,17 +42,17 @@ describe('HoodMonthData', () => {
     it('should create instance with valid month/year format', () => {
       expect(new HoodMonthData('3/2024', sampleData)).toBeTruthy();
       expect(new HoodMonthData('12/2024', sampleData)).toBeTruthy();
+      expect(new HoodMonthData('01/2024', sampleData).getMonthYear()).toBe('1/2024');
     });
 
     it('should throw error for invalid month/year formats', () => {
       const invalidFormats = [
-        '13/2024', // Invalid month
-        '0/2024', // Invalid month
-        '1/24', // Invalid year
-        '1-2024', // Wrong separator
-        '01/2024', // Leading zero
-        'abc', // Non-numeric
-        '' // Empty string
+        '13/2024',
+        '0/2024',
+        '1/24',
+        '1-2024',
+        'abc',
+        ''
       ];
 
       invalidFormats.forEach((format) => {
@@ -124,7 +123,7 @@ describe('HoodMonthData', () => {
         description: 'ACH Withdrawal'
       },
       {
-        process_date: '2/28/2024', // Previous month - should be ignored
+        process_date: '2/28/2024',
         activity_date: '2/28/2024',
         settle_date: '3/1/2024',
         symbol: '',
