@@ -4,9 +4,6 @@ This TypeScript project parses [Robinhood](https://robinhood.com/) account activ
 
 **IMPORTANT:** This project does **not** generate tax forms. It is a calculator for personal review only.
 
-## Requirements
-
-- [Node.js](https://nodejs.org/) **20.3.0** or newer
 
 ## Install
 
