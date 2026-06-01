@@ -13,8 +13,6 @@ cd robinhood-gainloss
 npm install
 ```
 
-`npm install` runs `prepare`, which compiles TypeScript to `dist/`.
-
 ## Setup
 
 1. In your Robinhood account, download your account activity report as one or more `.csv` files.
