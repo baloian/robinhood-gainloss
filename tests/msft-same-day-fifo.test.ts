@@ -87,7 +87,7 @@ describe('MSFT May 2024 same-day FIFO', () => {
     }
   });
 
-  it('fails sell 100 if same-day sells are sorted before buys (regression)', () => {
+  it('allows sell 100 when CSV lists same-day sells before buys (newest-first export)', () => {
     const sellsFirst: HoodTradeTy[] = [
       trade('5/1/2024', 'Sell', 100),
       trade('5/1/2024', 'Buy', 230),
@@ -98,11 +98,40 @@ describe('MSFT May 2024 same-day FIFO', () => {
     for (const row of rows) {
       if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
       else if (row.quantity === 100) {
-        const err = Validator.verifySell(queue, row.symbol, row.quantity);
-        expect(err).toMatch(/sell more than you have/);
+        expect(Validator.verifySell(queue, row.symbol, row.quantity)).toBeNull();
         return;
       }
     }
-    throw new Error('expected validation error');
+    throw new Error('expected sell 100 row');
+  });
+
+  it('allows May 2024 statement when rows match newest-first Robinhood export order', () => {
+    const mayNewestFirst: HoodTradeTy[] = [
+      trade('5/1/2024', 'Buy', 254),
+      trade('5/1/2024', 'Sell', 19),
+      trade('5/1/2024', 'Sell', 235),
+      trade('5/1/2024', 'Sell', 100),
+      trade('5/1/2024', 'Sell', 60),
+      trade('5/1/2024', 'Sell', 75),
+      trade('5/1/2024', 'Buy', 235),
+      trade('5/1/2024', 'Buy', 230)
+    ];
+    const rows = sortTradesByProcessDate([...aprilTrades, ...mayNewestFirst]);
+    const queue = new HoodQueue();
+    for (const row of rows) {
+      if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
+      else {
+        expect(Validator.verifySell(queue, row.symbol, row.quantity)).toBeNull();
+        let remaining = row.quantity;
+        while (remaining > 0) {
+          const buy = queue.front(row.symbol)!;
+          const take = Math.min(buy.quantity, remaining);
+          buy.quantity -= take;
+          remaining -= take;
+          if (buy.quantity <= 1e-8) queue.pop(row.symbol);
+        }
+      }
+    }
+    expect(queue.getQty('MSFT')).toBeGreaterThan(0);
   });
 });

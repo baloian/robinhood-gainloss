@@ -115,17 +115,27 @@ export function sortCsvFilesByNumericName(filePaths: string[]): string[] {
   return [...filePaths].sort((a, b) => csvFileNumericSortKey(a) - csvFileNumericSortKey(b));
 }
 
+/** Trade date used for FIFO ordering (Activity Date when present, else Process Date). */
+export function effectiveTradeDate(trade: HoodTradeTy): Date {
+  const activity = (trade.activity_date || '').trim();
+  if (activity) return parseRobinhoodDate(activity);
+  return parseRobinhoodDate(trade.process_date);
+}
+
 /**
- * Sort trades for FIFO processing by activity (trade) date. Same-day order is left
- * to the CSV export order (stable sort) so settlement process_date does not place
- * sells before buys traded the same day.
+ * Sort trades for FIFO processing by activity (trade) date. On the same trade day,
+ * buys are ordered before sells so Robinhood CSV row order (often newest-first within
+ * a month) does not run sells before same-day purchases. When trade dates tie,
+ * original CSV order is preserved (stable sort).
  */
 export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
   return [...rows].sort((a, b) => {
     const activityDiff =
-      parseRobinhoodDate(a.activity_date || a.process_date).getTime() -
-      parseRobinhoodDate(b.activity_date || b.process_date).getTime();
-    return activityDiff;
+      effectiveTradeDate(a).getTime() - effectiveTradeDate(b).getTime();
+    if (activityDiff !== 0) return activityDiff;
+    if (a.trans_code === 'Buy' && b.trans_code === 'Sell') return -1;
+    if (a.trans_code === 'Sell' && b.trans_code === 'Buy') return 1;
+    return 0;
   });
 }
 
