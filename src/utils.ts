@@ -115,11 +115,13 @@ export function sortCsvFilesByNumericName(filePaths: string[]): string[] {
   return [...filePaths].sort((a, b) => csvFileNumericSortKey(a) - csvFileNumericSortKey(b));
 }
 
+/**
+ * Sort trades for FIFO processing by activity (trade) date. Same-day order is left
+ * to the CSV export order (stable sort) so settlement process_date does not place
+ * sells before buys traded the same day.
+ */
 export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
   return [...rows].sort((a, b) => {
-    const dateDiff =
-      parseRobinhoodDate(a.process_date).getTime() - parseRobinhoodDate(b.process_date).getTime();
-    if (dateDiff !== 0) return dateDiff;
     const activityDiff =
       parseRobinhoodDate(a.activity_date || a.process_date).getTime() -
       parseRobinhoodDate(b.activity_date || b.process_date).getTime();
