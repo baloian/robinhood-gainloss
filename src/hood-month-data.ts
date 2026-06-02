@@ -42,7 +42,7 @@ export class HoodMonthData {
       benefit: 0,
       acats: 0
     };
-    const transCodeMap: { [key: string]: keyof typeof md } = {
+    const transCodeMap: Record<string, keyof MetaDataTy> = {
       GOLD: 'fees',
       MINT: 'fees',
       CDIV: 'dividend',

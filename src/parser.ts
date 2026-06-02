@@ -9,20 +9,22 @@ import {
   validateHoodTrade
 } from './utils';
 
+type CsvRecord = Record<string, string | undefined>;
+
 export default class Parser {
   static async parseCSV(filePath: string): Promise<HoodTradeTy[]> {
     return new Promise((resolve, reject) => {
       const results: HoodTradeTy[] = [];
       fs.createReadStream(filePath)
         .pipe(csv())
-        .on('data', (data) => {
+        .on('data', (data: CsvRecord) => {
           const row: HoodTradeTy = {
-            activityDate: data['Activity Date'],
-            processDate: data['Process Date'],
-            settleDate: data['Settle Date'],
-            symbol: data['Instrument'],
-            description: data['Description'],
-            transCode: data['Trans Code'],
+            activityDate: data['Activity Date'] || '',
+            processDate: data['Process Date'] || '',
+            settleDate: data['Settle Date'] || '',
+            symbol: data['Instrument'] || '',
+            description: data['Description'] || '',
+            transCode: data['Trans Code'] || '',
             quantity: convertToNumber(data['Quantity'] || ''),
             price: convertToNumber(data['Price'] || ''),
             amount: convertToNumber(data['Amount'] || '')

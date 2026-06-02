@@ -2,7 +2,7 @@ import * as path from 'path';
 import { deepCopy } from './utils';
 import Validator from './validator';
 import Parser from './parser';
-import { HoodTradeTy, SymbolProfitTy, GainLossTy } from '../types';
+import { HoodTradeTy, SymbolProfitTy, GainLossTy, TradeTransCode } from '../types';
 import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
@@ -19,7 +19,7 @@ import { HoodMonthData } from './hood-month-data';
 import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
 
-const UNHANDLED_TRANS_CODES = new Set([
+const UNHANDLED_TRANS_CODES: Set<TradeTransCode> = new Set([
   'Buy',
   'Sell',
   '',
@@ -92,7 +92,7 @@ export default class RobinhoodGainLoss {
     });
   }
 
-  private warnUnhandledTransCode(transCode: string): void {
+  private warnUnhandledTransCode(transCode: TradeTransCode): void {
     if (!transCode || UNHANDLED_TRANS_CODES.has(transCode) || this.warnedTransCodes.has(transCode)) {
       return;
     }
@@ -166,7 +166,7 @@ export default class RobinhoodGainLoss {
     }
   }
 
-  private reset() {
+  private reset(): void {
     this.hoodQueue = new HoodQueue();
     this.txsData = [];
     this.warnedUnmatchedSells.clear();

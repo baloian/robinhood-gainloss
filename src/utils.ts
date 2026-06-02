@@ -1,5 +1,5 @@
 import path from 'path';
-import { HoodTradeTy, GainLossTy, SymbolProfitTy } from '../types';
+import { HoodTradeTy, GainLossTy, SymbolProfitTy, SymbolProfitAccumulatorTy } from '../types';
 import { HoodMonthData } from './hood-month-data';
 import { ClosingTrade } from './closing-trade';
 
@@ -214,7 +214,7 @@ export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string):
 export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string): SymbolProfitTy[] {
   const normalizedMonth = normalizeMonthYear(monthYear);
   const trades = data.filter((d) => dateToMonthYear(d.sellProcessDate) === normalizedMonth);
-  const result: { [key: string]: { totalProfit: number; totalInvestment: number } } = {};
+  const result: SymbolProfitAccumulatorTy = {};
   trades.forEach((trade: ClosingTrade) => {
     const symbol = trade.getSymbol();
     if (!result[symbol]) result[symbol] = { totalProfit: 0, totalInvestment: 0 };
@@ -234,7 +234,7 @@ export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string):
 
 export function getOrderedHoodMonthsData(rows: HoodTradeTy[]): HoodMonthData[] {
   const data: HoodMonthData[] = [];
-  const monthYearData: { [key: string]: boolean } = {};
+  const monthYearData: Record<string, boolean> = {};
   for (const row of rows) {
     const monthYear: string = dateToMonthYear(row.processDate);
     if (!monthYearData[monthYear]) {
