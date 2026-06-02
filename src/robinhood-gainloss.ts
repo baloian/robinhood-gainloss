@@ -78,7 +78,7 @@ export default class RobinhoodGainLoss {
 
   private processTrades(rows: HoodTradeTy[]): void {
     rows.forEach((trade) => {
-      switch (trade.trans_code) {
+      switch (trade.transCode) {
         case 'Buy':
           this.hoodQueue.push(trade.symbol, { ...trade });
           break;
@@ -86,7 +86,7 @@ export default class RobinhoodGainLoss {
           this.processSellTrade(trade);
           break;
         default:
-          this.warnUnhandledTransCode(trade.trans_code);
+          this.warnUnhandledTransCode(trade.transCode);
           break;
       }
     });
@@ -104,11 +104,11 @@ export default class RobinhoodGainLoss {
   }
 
   private unmatchedSellKey(sellTrade: HoodTradeTy): string {
-    return `${sellTrade.symbol}|${sellTrade.process_date}|${sellTrade.quantity}`;
+    return `${sellTrade.symbol}|${sellTrade.processDate}|${sellTrade.quantity}`;
   }
 
   private warnUnmatchedSell(sellTrade: HoodTradeTy, message: string): void {
-    if (dateToMonthYear(sellTrade.process_date) !== this.statementMonthYear) return;
+    if (dateToMonthYear(sellTrade.processDate) !== this.statementMonthYear) return;
     const key = this.unmatchedSellKey(sellTrade);
     if (this.warnedUnmatchedSells.has(key)) return;
     this.warnedUnmatchedSells.add(key);

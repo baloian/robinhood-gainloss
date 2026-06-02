@@ -4,22 +4,22 @@ import Validator from '../src/validator';
 import { sortTradesByProcessDate } from '../src/utils';
 
 function trade(
-  process_date: string,
-  trans_code: 'Buy' | 'Sell',
+  processDate: string,
+  transCode: 'Buy' | 'Sell',
   quantity: number,
-  activity_date?: string
+  activityDate?: string
 ): HoodTradeTy {
   const price = 390;
   return {
-    activity_date: activity_date ?? process_date,
-    process_date,
-    settle_date: process_date,
+    activityDate: activityDate ?? processDate,
+    processDate: processDate,
+    settleDate: processDate,
     symbol: 'MSFT',
     description: '',
-    trans_code,
+    transCode: transCode,
     quantity,
     price,
-    amount: trans_code === 'Buy' ? -quantity * price : quantity * price
+    amount: transCode === 'Buy' ? -quantity * price : quantity * price
   };
 }
 
@@ -45,7 +45,7 @@ describe('MSFT May 2024 same-day FIFO', () => {
     const rows = sortTradesByProcessDate([...aprilTrades, ...mayTrades]);
     const queue = new HoodQueue();
     for (const row of rows) {
-      if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
+      if (row.transCode === 'Buy') queue.push(row.symbol, { ...row });
       else {
         const err = Validator.verifySell(queue, row.symbol, row.quantity);
         expect(err).toBeNull();
@@ -72,7 +72,7 @@ describe('MSFT May 2024 same-day FIFO', () => {
     const rows = sortTradesByProcessDate([...aprilTrades, ...settlementLag]);
     const queue = new HoodQueue();
     for (const row of rows) {
-      if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
+      if (row.transCode === 'Buy') queue.push(row.symbol, { ...row });
       else {
         expect(Validator.verifySell(queue, row.symbol, row.quantity)).toBeNull();
         let remaining = row.quantity;
@@ -96,7 +96,7 @@ describe('MSFT May 2024 same-day FIFO', () => {
     const rows = sortTradesByProcessDate([...aprilTrades, ...sellsFirst]);
     const queue = new HoodQueue();
     for (const row of rows) {
-      if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
+      if (row.transCode === 'Buy') queue.push(row.symbol, { ...row });
       else if (row.quantity === 100) {
         expect(Validator.verifySell(queue, row.symbol, row.quantity)).toBeNull();
         return;
@@ -119,7 +119,7 @@ describe('MSFT May 2024 same-day FIFO', () => {
     const rows = sortTradesByProcessDate([...aprilTrades, ...mayNewestFirst]);
     const queue = new HoodQueue();
     for (const row of rows) {
-      if (row.trans_code === 'Buy') queue.push(row.symbol, { ...row });
+      if (row.transCode === 'Buy') queue.push(row.symbol, { ...row });
       else {
         expect(Validator.verifySell(queue, row.symbol, row.quantity)).toBeNull();
         let remaining = row.quantity;

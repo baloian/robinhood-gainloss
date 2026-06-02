@@ -8,22 +8,22 @@ describe('calculateSymbolProfits', () => {
         symbol: sym,
         quantity: bq,
         price: bp,
-        process_date: '1/1/2023',
-        activity_date: '1/1/2023',
-        settle_date: '',
+        processDate: '1/1/2023',
+        activityDate: '1/1/2023',
+        settleDate: '',
         description: '',
-        trans_code: 'Buy',
+        transCode: 'Buy',
         amount: -bq * bp
       },
       {
         symbol: sym,
         quantity: sq,
         price: sp,
-        process_date: '6/1/2023',
-        activity_date: '6/1/2023',
-        settle_date: '',
+        processDate: '6/1/2023',
+        activityDate: '6/1/2023',
+        settleDate: '',
         description: '',
-        trans_code: 'Sell',
+        transCode: 'Sell',
         amount: sq * sp
       }
     );
@@ -35,8 +35,8 @@ describe('calculateSymbolProfits', () => {
     expect(result).toEqual([
       {
         symbol: 'A',
-        total_profit: 50,
-        total_profit_pct: 3.33
+        totalProfit: 50,
+        totalProfitPct: 3.33
       }
     ]);
   });

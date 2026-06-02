@@ -115,9 +115,9 @@ export function sortCsvFilesByNumericName(filePaths: string[]): string[] {
 
 /** Trade date used for FIFO ordering (Activity Date when present, else Process Date). */
 export function effectiveTradeDate(trade: HoodTradeTy): Date {
-  const activity = (trade.activity_date || '').trim();
+  const activity = (trade.activityDate || '').trim();
   if (activity) return parseRobinhoodDate(activity);
-  return parseRobinhoodDate(trade.process_date);
+  return parseRobinhoodDate(trade.processDate);
 }
 
 /**
@@ -130,8 +130,8 @@ export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
   return [...rows].sort((a, b) => {
     const activityDiff = effectiveTradeDate(a).getTime() - effectiveTradeDate(b).getTime();
     if (activityDiff !== 0) return activityDiff;
-    if (a.trans_code === 'Buy' && b.trans_code === 'Sell') return -1;
-    if (a.trans_code === 'Sell' && b.trans_code === 'Buy') return 1;
+    if (a.transCode === 'Buy' && b.transCode === 'Sell') return -1;
+    if (a.transCode === 'Sell' && b.transCode === 'Buy') return 1;
     return 0;
   });
 }
@@ -158,27 +158,27 @@ export function proportionalAmount(trade: HoodTradeTy, qty: number): number {
   if (trade.quantity && !isNaN(trade.amount) && trade.amount !== 0) {
     let amt = round(trade.amount * (qty / trade.quantity));
     // Robinhood uses negative amounts for buys; normalize if CSV has positive cost.
-    if (trade.trans_code === 'Buy' && amt > 0) amt = -amt;
-    if (trade.trans_code === 'Sell' && amt < 0) amt = -amt;
+    if (trade.transCode === 'Buy' && amt > 0) amt = -amt;
+    if (trade.transCode === 'Sell' && amt < 0) amt = -amt;
     return amt;
   }
-  const sign = trade.trans_code === 'Buy' ? -1 : 1;
+  const sign = trade.transCode === 'Buy' ? -1 : 1;
   return round(sign * trade.price * qty);
 }
 
 export function validateHoodTrade(row: HoodTradeTy, source: string): void {
-  if (row.trans_code !== 'Buy' && row.trans_code !== 'Sell') return;
+  if (row.transCode !== 'Buy' && row.transCode !== 'Sell') return;
   if (!row.symbol) {
-    throw new Error(`${source}: ${row.trans_code} row is missing symbol (${row.process_date}).`);
+    throw new Error(`${source}: ${row.transCode} row is missing symbol (${row.processDate}).`);
   }
   if (isNaN(row.quantity) || row.quantity <= 0) {
     throw new Error(
-      `${source}: invalid quantity for ${row.symbol} ${row.trans_code} on ${row.process_date}.`
+      `${source}: invalid quantity for ${row.symbol} ${row.transCode} on ${row.processDate}.`
     );
   }
   if (isNaN(row.price) || row.price < 0) {
     throw new Error(
-      `${source}: invalid price for ${row.symbol} ${row.trans_code} on ${row.process_date}.`
+      `${source}: invalid price for ${row.symbol} ${row.transCode} on ${row.processDate}.`
     );
   }
 }
@@ -187,7 +187,7 @@ export function getTradesByMonth(rows: HoodTradeTy[], month: string): HoodTradeT
   const normalizedMonth = normalizeMonthYear(month);
   return rows.filter(
     (row) =>
-      row.process_date && isMonthYearLessOrEqual(dateToMonthYear(row.process_date), normalizedMonth)
+      row.processDate && isMonthYearLessOrEqual(dateToMonthYear(row.processDate), normalizedMonth)
   );
 }
 
@@ -195,40 +195,39 @@ export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string):
   const normalizedMonth = normalizeMonthYear(monthYear);
   const trades = data.filter((d) => dateToMonthYear(d.sellProcessDate) === normalizedMonth);
   const profitSummary: GainLossTy = {
-    long_term_profit: 0,
-    short_term_profit: 0
+    longTermProfit: 0,
+    shortTermProfit: 0
   };
   trades.forEach((trade: ClosingTrade) => {
     if (trade.isLongTerm()) {
-      profitSummary.long_term_profit += trade.profit;
+      profitSummary.longTermProfit += trade.profit;
     } else {
-      profitSummary.short_term_profit += trade.profit;
+      profitSummary.shortTermProfit += trade.profit;
     }
   });
   return {
-    long_term_profit: round(profitSummary.long_term_profit),
-    short_term_profit: round(profitSummary.short_term_profit)
+    longTermProfit: round(profitSummary.longTermProfit),
+    shortTermProfit: round(profitSummary.shortTermProfit)
   };
 }
 
 export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string): SymbolProfitTy[] {
   const normalizedMonth = normalizeMonthYear(monthYear);
   const trades = data.filter((d) => dateToMonthYear(d.sellProcessDate) === normalizedMonth);
-  const result: { [key: string]: { total_profit: number; total_investment: number } } = {};
+  const result: { [key: string]: { totalProfit: number; totalInvestment: number } } = {};
   trades.forEach((trade: ClosingTrade) => {
     const symbol = trade.getSymbol();
-    if (!result[symbol]) result[symbol] = { total_profit: 0, total_investment: 0 };
-    result[symbol].total_profit += trade.getProfit();
-    result[symbol].total_investment += trade.getInvestment();
+    if (!result[symbol]) result[symbol] = { totalProfit: 0, totalInvestment: 0 };
+    result[symbol].totalProfit += trade.getProfit();
+    result[symbol].totalInvestment += trade.getInvestment();
   });
   return Object.keys(result).map((symbol) => {
-    const { total_profit, total_investment } = result[symbol];
-    const total_profit_pct =
-      total_investment === 0 ? 0 : round((total_profit / total_investment) * 100);
+    const { totalProfit, totalInvestment } = result[symbol];
+    const totalProfitPct = totalInvestment === 0 ? 0 : round((totalProfit / totalInvestment) * 100);
     return {
       symbol,
-      total_profit: round(total_profit),
-      total_profit_pct
+      totalProfit: round(totalProfit),
+      totalProfitPct: round(totalProfitPct)
     };
   });
 }
@@ -237,7 +236,7 @@ export function getOrderedHoodMonthsData(rows: HoodTradeTy[]): HoodMonthData[] {
   const data: HoodMonthData[] = [];
   const monthYearData: { [key: string]: boolean } = {};
   for (const row of rows) {
-    const monthYear: string = dateToMonthYear(row.process_date);
+    const monthYear: string = dateToMonthYear(row.processDate);
     if (!monthYearData[monthYear]) {
       monthYearData[monthYear] = true;
       data.push(new HoodMonthData(monthYear, getTradesByMonth(rows, monthYear)));

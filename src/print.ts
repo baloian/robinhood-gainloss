@@ -107,14 +107,14 @@ export function printHoldings(data: HoodQueue): void {
 }
 
 export function printGainLoss(data: SymbolProfitTy[], gainLoss: GainLossTy): void {
-  const grandTotal = gainLoss.short_term_profit + gainLoss.long_term_profit;
+  const grandTotal = gainLoss.shortTermProfit + gainLoss.longTermProfit;
 
   printSection('Realized Gain/Loss');
-  printRow('Total (short term)', formatToUSD(gainLoss.short_term_profit), {
-    colorAmount: gainLoss.short_term_profit
+  printRow('Total (short term)', formatToUSD(gainLoss.shortTermProfit), {
+    colorAmount: gainLoss.shortTermProfit
   });
-  printRow('Total (long term)', formatToUSD(gainLoss.long_term_profit), {
-    colorAmount: gainLoss.long_term_profit
+  printRow('Total (long term)', formatToUSD(gainLoss.longTermProfit), {
+    colorAmount: gainLoss.longTermProfit
   });
   printRow('Total', formatToUSD(grandTotal), { colorAmount: grandTotal });
 
@@ -127,8 +127,8 @@ export function printGainLoss(data: SymbolProfitTy[], gainLoss: GainLossTy): voi
     ['Symbol', 'Realized', '%'],
     sorted.map((item) => [
       item.symbol,
-      formatToUSD(item.total_profit),
-      formatPercent(item.total_profit_pct)
+      formatToUSD(item.totalProfit),
+      formatPercent(item.totalProfitPct)
     ]),
     ['left', 'right', 'right']
   );
@@ -138,9 +138,9 @@ export function printBuySellTable(txs: HoodTradeTy[]): void {
   if (!txs.length) return;
 
   const rows = txs.map((tx) => [
-    tx.process_date,
+    tx.processDate,
     tx.symbol,
-    tx.trans_code === 'Buy' ? 'BUY' : 'SELL',
+    tx.transCode === 'Buy' ? 'BUY' : 'SELL',
     formatQty(tx.quantity),
     formatToUSD(tx.price),
     formatToUSD(tx.amount)

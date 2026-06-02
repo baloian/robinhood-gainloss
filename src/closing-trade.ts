@@ -31,10 +31,10 @@ export class ClosingTrade {
     this.symbol = buyTrade.symbol;
     this.buyQty = matchedQty;
     this.sellQty = matchedQty;
-    this.buyProcessDate = buyTrade.process_date;
-    this.sellProcessDate = sellTrade.process_date;
-    this.buyActivityDate = buyTrade.activity_date || buyTrade.process_date;
-    this.sellActivityDate = sellTrade.activity_date || sellTrade.process_date;
+    this.buyProcessDate = buyTrade.processDate;
+    this.sellProcessDate = sellTrade.processDate;
+    this.buyActivityDate = buyTrade.activityDate || buyTrade.processDate;
+    this.sellActivityDate = sellTrade.activityDate || sellTrade.processDate;
     this.buyPrice = buyTrade.price;
     this.sellPrice = sellTrade.price;
     this.profit = round(sellAmt + buyAmt);

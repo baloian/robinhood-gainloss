@@ -27,8 +27,8 @@ export class HoodMonthData {
   getBuySellTxs(): HoodTradeTy[] {
     return this.data.filter(
       (row) =>
-        this.monthYear === dateToMonthYear(row.process_date) &&
-        (row.trans_code === 'Sell' || row.trans_code === 'Buy')
+        this.monthYear === dateToMonthYear(row.processDate) &&
+        (row.transCode === 'Sell' || row.transCode === 'Buy')
     );
   }
 
@@ -53,11 +53,11 @@ export class HoodMonthData {
       'T/A': 'benefit'
     };
     this.data.forEach((row: HoodTradeTy) => {
-      if (this.monthYear !== dateToMonthYear(row.process_date)) return;
-      const property = transCodeMap[row.trans_code];
+      if (this.monthYear !== dateToMonthYear(row.processDate)) return;
+      const property = transCodeMap[row.transCode];
       if (property) {
         md[property] += row.amount;
-      } else if (row.trans_code === 'ACH') {
+      } else if (row.transCode === 'ACH') {
         const desc = (row.description || '').toLowerCase();
         if (desc.includes('deposit')) md.deposit += row.amount;
         else if (desc.includes('withdrawal')) md.withdrawal += row.amount;

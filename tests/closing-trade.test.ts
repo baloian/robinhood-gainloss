@@ -7,11 +7,11 @@ describe('ClosingTrade', () => {
     symbol: 'AAPL',
     quantity: 10,
     price: 150.5,
-    process_date: '1/15/2024',
-    activity_date: '1/15/2024',
-    settle_date: '1/17/2024',
+    processDate: '1/15/2024',
+    activityDate: '1/15/2024',
+    settleDate: '1/17/2024',
     description: 'Buy AAPL',
-    trans_code: 'Buy',
+    transCode: 'Buy',
     amount: 1505.0
   };
 
@@ -19,11 +19,11 @@ describe('ClosingTrade', () => {
     symbol: 'AAPL',
     quantity: 10,
     price: 165.75,
-    process_date: '1/20/2024',
-    activity_date: '1/20/2024',
-    settle_date: '1/22/2024',
+    processDate: '1/20/2024',
+    activityDate: '1/20/2024',
+    settleDate: '1/22/2024',
     description: 'Sell AAPL',
-    trans_code: 'Sell',
+    transCode: 'Sell',
     amount: 1657.5
   };
 

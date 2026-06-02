@@ -3,10 +3,10 @@ import { HoodTradeTy } from '../types';
 
 describe('getTradesByMonth', () => {
   const mockTrades: HoodTradeTy[] = [
-    { process_date: '1/15/2024', symbol: 'AAPL' } as HoodTradeTy,
-    { process_date: '2/20/2024', symbol: 'GOOGL' } as HoodTradeTy,
-    { process_date: '3/10/2024', symbol: 'MSFT' } as HoodTradeTy,
-    { process_date: '4/05/2024', symbol: 'TSLA' } as HoodTradeTy
+    { processDate: '1/15/2024', symbol: 'AAPL' } as HoodTradeTy,
+    { processDate: '2/20/2024', symbol: 'GOOGL' } as HoodTradeTy,
+    { processDate: '3/10/2024', symbol: 'MSFT' } as HoodTradeTy,
+    { processDate: '4/05/2024', symbol: 'TSLA' } as HoodTradeTy
   ];
 
   it('return trades for the given month and earlier months', () => {

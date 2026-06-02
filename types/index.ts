@@ -1,10 +1,10 @@
 export interface HoodTradeTy {
-  activity_date: string;
-  process_date: string;
-  settle_date: string;
+  activityDate: string;
+  processDate: string;
+  settleDate: string;
   symbol: string;
   description: string;
-  trans_code: string;
+  transCode: string;
   quantity: number;
   price: number;
   amount: number;
@@ -13,8 +13,8 @@ export interface HoodTradeTy {
 
 export interface SymbolProfitTy {
   symbol: string;
-  total_profit: number;
-  total_profit_pct: number;
+  totalProfit: number;
+  totalProfitPct: number;
 };
 
 
@@ -30,6 +30,6 @@ export interface MetaDataTy {
 
 
 export interface GainLossTy {
-  long_term_profit: number;
-  short_term_profit: number;
+  longTermProfit: number;
+  shortTermProfit: number;
 }

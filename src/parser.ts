@@ -17,17 +17,17 @@ export default class Parser {
         .pipe(csv())
         .on('data', (data) => {
           const row: HoodTradeTy = {
-            activity_date: data['Activity Date'],
-            process_date: data['Process Date'],
-            settle_date: data['Settle Date'],
+            activityDate: data['Activity Date'],
+            processDate: data['Process Date'],
+            settleDate: data['Settle Date'],
             symbol: data['Instrument'],
             description: data['Description'],
-            trans_code: data['Trans Code'],
+            transCode: data['Trans Code'],
             quantity: convertToNumber(data['Quantity'] || ''),
             price: convertToNumber(data['Price'] || ''),
             amount: convertToNumber(data['Amount'] || '')
           };
-          if (!row.process_date) return;
+          if (!row.processDate) return;
           try {
             validateHoodTrade(row, filePath);
           } catch (err) {
@@ -51,11 +51,9 @@ export default class Parser {
       .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.csv'))
       .map((entry) => path.join(dirPath, entry.name));
     const csvFiles = sortCsvFilesByNumericName(csvFilePaths);
-
     if (csvFiles.length === 0) {
       throw new Error(`No CSV files found in ${dirPath}`);
     }
-
     const allRows: HoodTradeTy[] = [];
     for (const filePath of csvFiles) {
       allRows.push(...(await Parser.parseCSV(filePath)));
