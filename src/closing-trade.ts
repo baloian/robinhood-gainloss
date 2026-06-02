@@ -9,16 +9,16 @@ import {
 
 export interface ClosingTrade {
   symbol: string;
-  buy_qty: number;
-  sell_qty: number;
-  buy_process_date: string;
-  sell_process_date: string;
-  buy_activity_date: string;
-  sell_activity_date: string;
-  buy_price: number;
-  sell_price: number;
+  buyQty: number;
+  sellQty: number;
+  buyProcessDate: string;
+  sellProcessDate: string;
+  buyActivityDate: string;
+  sellActivityDate: string;
+  buyPrice: number;
+  sellPrice: number;
   profit: number;
-  profit_pct: number;
+  profitPct: number;
   investment: number;
 
   isLongTerm(): boolean;
@@ -32,16 +32,16 @@ export interface ClosingTrade {
 
 export class ClosingTrade implements ClosingTrade {
   symbol: string;
-  buy_qty: number;
-  sell_qty: number;
-  buy_process_date: string;
-  sell_process_date: string;
-  buy_activity_date: string;
-  sell_activity_date: string;
-  buy_price: number;
-  sell_price: number;
+  buyQty: number;
+  sellQty: number;
+  buyProcessDate: string;
+  sellProcessDate: string;
+  buyActivityDate: string;
+  sellActivityDate: string;
+  buyPrice: number;
+  sellPrice: number;
   profit: number;
-  profit_pct: number;
+  profitPct: number;
   investment: number;
 
   constructor(buyTrade: HoodTradeTy, sellTrade: HoodTradeTy) {
@@ -52,26 +52,26 @@ export class ClosingTrade implements ClosingTrade {
     const sellValue = Math.abs(sellAmt);
 
     this.symbol = buyTrade.symbol;
-    this.buy_qty = matchedQty;
-    this.sell_qty = matchedQty;
-    this.buy_process_date = buyTrade.process_date;
-    this.sell_process_date = sellTrade.process_date;
-    this.buy_activity_date = buyTrade.activity_date || buyTrade.process_date;
-    this.sell_activity_date = sellTrade.activity_date || sellTrade.process_date;
-    this.buy_price = buyTrade.price;
-    this.sell_price = sellTrade.price;
+    this.buyQty = matchedQty;
+    this.sellQty = matchedQty;
+    this.buyProcessDate = buyTrade.process_date;
+    this.sellProcessDate = sellTrade.process_date;
+    this.buyActivityDate = buyTrade.activity_date || buyTrade.process_date;
+    this.sellActivityDate = sellTrade.activity_date || sellTrade.process_date;
+    this.buyPrice = buyTrade.price;
+    this.sellPrice = sellTrade.price;
     this.profit = round(sellAmt + buyAmt);
     this.investment = buyValue;
-    this.profit_pct = buyValue === 0 ? 0 : pctChange(sellValue, buyValue);
+    this.profitPct = buyValue === 0 ? 0 : pctChange(sellValue, buyValue);
   }
 
   isLongTerm(): boolean {
-    return isLongTermCapitalGain(this.buy_activity_date, this.sell_activity_date);
+    return isLongTermCapitalGain(this.buyActivityDate, this.sellActivityDate);
   }
 
   getHoldingTimeMs(): number {
-    const buyDate = parseRobinhoodDate(this.buy_activity_date);
-    const sellDate = parseRobinhoodDate(this.sell_activity_date);
+    const buyDate = parseRobinhoodDate(this.buyActivityDate);
+    const sellDate = parseRobinhoodDate(this.sellActivityDate);
     return sellDate.getTime() - buyDate.getTime();
   }
 
@@ -92,6 +92,6 @@ export class ClosingTrade implements ClosingTrade {
   }
 
   getProfitPct(): number {
-    return this.profit_pct;
+    return this.profitPct;
   }
 }

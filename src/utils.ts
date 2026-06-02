@@ -193,7 +193,7 @@ export function getTradesByMonth(rows: HoodTradeTy[], month: string): HoodTradeT
 
 export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string): GainLossTy {
   const normalizedMonth = normalizeMonthYear(monthYear);
-  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === normalizedMonth);
+  const trades = data.filter((d) => dateToMonthYear(d.sellProcessDate) === normalizedMonth);
   const profitSummary: GainLossTy = {
     long_term_profit: 0,
     short_term_profit: 0
@@ -213,7 +213,7 @@ export function calculateTotalGainLoss(data: ClosingTrade[], monthYear: string):
 
 export function calculateSymbolProfits(data: ClosingTrade[], monthYear: string): SymbolProfitTy[] {
   const normalizedMonth = normalizeMonthYear(monthYear);
-  const trades = data.filter((d) => dateToMonthYear(d.sell_process_date) === normalizedMonth);
+  const trades = data.filter((d) => dateToMonthYear(d.sellProcessDate) === normalizedMonth);
   const result: { [key: string]: { total_profit: number; total_investment: number } } = {};
   trades.forEach((trade: ClosingTrade) => {
     const symbol = trade.getSymbol();

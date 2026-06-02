@@ -33,14 +33,14 @@ describe('ClosingTrade', () => {
 
   test('constructor initializes properties correctly', () => {
     expect(closingTrade.symbol).toBe('AAPL');
-    expect(closingTrade.buy_qty).toBe(10);
-    expect(closingTrade.sell_qty).toBe(10);
-    expect(closingTrade.buy_price).toBe(150.5);
-    expect(closingTrade.sell_price).toBe(165.75);
-    expect(closingTrade.buy_process_date).toBe('1/15/2024');
-    expect(closingTrade.sell_process_date).toBe('1/20/2024');
+    expect(closingTrade.buyQty).toBe(10);
+    expect(closingTrade.sellQty).toBe(10);
+    expect(closingTrade.buyPrice).toBe(150.5);
+    expect(closingTrade.sellPrice).toBe(165.75);
+    expect(closingTrade.buyProcessDate).toBe('1/15/2024');
+    expect(closingTrade.sellProcessDate).toBe('1/20/2024');
     expect(closingTrade.profit).toBe(round(sellValue - buyValue));
-    expect(closingTrade.profit_pct).toBeCloseTo(pctChange(sellValue, buyValue));
+    expect(closingTrade.profitPct).toBeCloseTo(pctChange(sellValue, buyValue));
   });
 
   test('getHoldingTimeMs returns correct time difference', () => {
