@@ -1,5 +1,5 @@
 import path from 'path';
-import { HoodTradeTy, GainLossTy, SymbolProfitTy, SymbolProfitAccumulatorTy } from '../types';
+import { HoodTradeTy, GainLossTy, SymbolProfitTy, SymbolProfitAccumulatorTy, TransCode } from '../types';
 import { HoodMonthData } from './hood-month-data';
 import { ClosingTrade } from './closing-trade';
 
@@ -130,8 +130,8 @@ export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
   return [...rows].sort((a, b) => {
     const activityDiff = effectiveTradeDate(a).getTime() - effectiveTradeDate(b).getTime();
     if (activityDiff !== 0) return activityDiff;
-    if (a.transCode === 'Buy' && b.transCode === 'Sell') return -1;
-    if (a.transCode === 'Sell' && b.transCode === 'Buy') return 1;
+    if (a.transCode === TransCode.BUY && b.transCode === TransCode.SELL) return -1;
+    if (a.transCode === TransCode.SELL && b.transCode === TransCode.BUY) return 1;
     return 0;
   });
 }
@@ -158,16 +158,16 @@ export function proportionalAmount(trade: HoodTradeTy, qty: number): number {
   if (trade.quantity && !isNaN(trade.amount) && trade.amount !== 0) {
     let amt = round(trade.amount * (qty / trade.quantity));
     // Robinhood uses negative amounts for buys; normalize if CSV has positive cost.
-    if (trade.transCode === 'Buy' && amt > 0) amt = -amt;
-    if (trade.transCode === 'Sell' && amt < 0) amt = -amt;
+    if (trade.transCode === TransCode.BUY && amt > 0) amt = -amt;
+    if (trade.transCode === TransCode.SELL && amt < 0) amt = -amt;
     return amt;
   }
-  const sign = trade.transCode === 'Buy' ? -1 : 1;
+  const sign = trade.transCode === TransCode.BUY ? -1 : 1;
   return round(sign * trade.price * qty);
 }
 
 export function validateHoodTrade(row: HoodTradeTy, source: string): void {
-  if (row.transCode !== 'Buy' && row.transCode !== 'Sell') return;
+  if (row.transCode !== TransCode.BUY && row.transCode !== TransCode.SELL) return;
   if (!row.symbol) {
     throw new Error(`${source}: ${row.transCode} row is missing symbol (${row.processDate}).`);
   }

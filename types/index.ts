@@ -1,17 +1,19 @@
-export type TradeTransCode =
-  | 'Buy'
-  | 'Sell'
-  | ''
-  | 'GOLD'
-  | 'MINT'
-  | 'CDIV'
-  | 'MDIV'
-  | 'INT'
-  | 'ACATI'
-  | 'GDBP'
-  | 'T/A'
-  | 'ACH'
-  | string;
+export enum TransCode {
+  BUY = 'Buy',
+  SELL = 'Sell',
+  EMPTY = '',
+  GOLD = 'GOLD',
+  MINT = 'MINT',
+  CDIV = 'CDIV',
+  MDIV = 'MDIV',
+  INT = 'INT',
+  ACATI = 'ACATI',
+  GDBP = 'GDBP',
+  TA = 'T/A',
+  ACH = 'ACH'
+}
+
+export type TradeTransCode = TransCode | string;
 
 export interface HoodTradeTy {
   activityDate: string;

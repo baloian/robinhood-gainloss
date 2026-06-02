@@ -1,4 +1,4 @@
-import { HoodTradeTy, MetaDataTy } from '../types';
+import { HoodTradeTy, MetaDataTy, TransCode } from '../types';
 import { dateToMonthYear, formatToUSD, normalizeMonthYear, numberToMonth } from './utils';
 import { printBuySellTable, printMonthHeadline, printRow } from './print';
 
@@ -28,7 +28,7 @@ export class HoodMonthData {
     return this.data.filter(
       (row) =>
         this.monthYear === dateToMonthYear(row.processDate) &&
-        (row.transCode === 'Sell' || row.transCode === 'Buy')
+        (row.transCode === TransCode.SELL || row.transCode === TransCode.BUY)
     );
   }
 
@@ -57,7 +57,7 @@ export class HoodMonthData {
       const property = transCodeMap[row.transCode];
       if (property) {
         md[property] += row.amount;
-      } else if (row.transCode === 'ACH') {
+      } else if (row.transCode === TransCode.ACH) {
         const desc = (row.description || '').toLowerCase();
         if (desc.includes('deposit')) md.deposit += row.amount;
         else if (desc.includes('withdrawal')) md.withdrawal += row.amount;

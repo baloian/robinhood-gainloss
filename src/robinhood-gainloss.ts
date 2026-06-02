@@ -2,7 +2,7 @@ import * as path from 'path';
 import { deepCopy } from './utils';
 import Validator from './validator';
 import Parser from './parser';
-import { HoodTradeTy, SymbolProfitTy, GainLossTy, TradeTransCode } from '../types';
+import { HoodTradeTy, SymbolProfitTy, GainLossTy, TradeTransCode, TransCode } from '../types';
 import {
   calculateSymbolProfits,
   calculateTotalGainLoss,
@@ -20,18 +20,18 @@ import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
 
 const UNHANDLED_TRANS_CODES: Set<TradeTransCode> = new Set([
-  'Buy',
-  'Sell',
-  '',
-  'GOLD',
-  'MINT',
-  'CDIV',
-  'MDIV',
-  'INT',
-  'ACATI',
-  'GDBP',
-  'T/A',
-  'ACH'
+  TransCode.BUY,
+  TransCode.SELL,
+  TransCode.EMPTY,
+  TransCode.GOLD,
+  TransCode.MINT,
+  TransCode.CDIV,
+  TransCode.MDIV,
+  TransCode.INT,
+  TransCode.ACATI,
+  TransCode.GDBP,
+  TransCode.TA,
+  TransCode.ACH
 ]);
 
 export default class RobinhoodGainLoss {
@@ -79,10 +79,10 @@ export default class RobinhoodGainLoss {
   private processTrades(rows: HoodTradeTy[]): void {
     rows.forEach((trade) => {
       switch (trade.transCode) {
-        case 'Buy':
+        case TransCode.BUY:
           this.hoodQueue.push(trade.symbol, { ...trade });
           break;
-        case 'Sell':
+        case TransCode.SELL:
           this.processSellTrade(trade);
           break;
         default:

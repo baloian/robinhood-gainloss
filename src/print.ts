@@ -1,4 +1,4 @@
-import { SymbolProfitTy, GainLossTy, HoodTradeTy } from '../types';
+import { SymbolProfitTy, GainLossTy, HoodTradeTy, TransCode } from '../types';
 import { HoodQueue } from './hood-queue';
 import { LinkedList } from 'typescript-ds-lib';
 import { formatToUSD, round } from './utils';
@@ -140,7 +140,7 @@ export function printBuySellTable(txs: HoodTradeTy[]): void {
   const rows = txs.map((tx) => [
     tx.processDate,
     tx.symbol,
-    tx.transCode === 'Buy' ? 'BUY' : 'SELL',
+    tx.transCode === TransCode.BUY ? 'BUY' : 'SELL',
     formatQty(tx.quantity),
     formatToUSD(tx.price),
     formatToUSD(tx.amount)
