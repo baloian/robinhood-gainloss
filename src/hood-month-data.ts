@@ -1,6 +1,6 @@
 import { HoodTradeTy, MetaDataTy, TransCode } from '../types';
 import { dateToMonthYear, formatToUSD, normalizeMonthYear, numberToMonth } from './utils';
-import { printBuySellTable, printMonthHeadline, printRow } from './print';
+import { printer } from './print';
 
 export class HoodMonthData {
   monthYear: string;
@@ -81,7 +81,7 @@ export class HoodMonthData {
     if (!hasMetadata) return;
 
     rows.forEach(([label, amount]) => {
-      if (amount) printRow(label, formatToUSD(amount), { useDots: true });
+      if (amount) printer.printRow(label, formatToUSD(amount), { useDots: true });
     });
     console.log('');
   }
@@ -89,11 +89,11 @@ export class HoodMonthData {
   printBuySellTxs(): void {
     const txs: HoodTradeTy[] = this.getBuySellTxs();
     if (!txs.length) return;
-    printBuySellTable([...txs].reverse());
+    printer.printBuySellTable([...txs].reverse());
   }
 
   printHeadline(): void {
     const d = this.monthYear.split('/');
-    printMonthHeadline(`${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`);
+    printer.printMonthHeadline(`${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`);
   }
 }

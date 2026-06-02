@@ -14,7 +14,7 @@ import {
   isQtyGreaterOrEqual,
   quantitiesEqual
 } from './utils';
-import { printHoldings, printGainLoss } from './print';
+import { printer } from './print';
 import { HoodMonthData } from './hood-month-data';
 import { HoodQueue } from './hood-queue';
 import { ClosingTrade } from './closing-trade';
@@ -60,7 +60,7 @@ export default class RobinhoodGainLoss {
       monthData.printBuySellTxs();
       monthData.printMetadata();
       this.processTrades(deepCopy(monthData.getData()));
-      printHoldings(this.hoodQueue);
+      printer.printHoldings(this.hoodQueue);
       this.reset();
       this.processTrades(deepCopy(monthData.getData()));
       const symbolProfits: SymbolProfitTy[] = calculateSymbolProfits(
@@ -71,7 +71,7 @@ export default class RobinhoodGainLoss {
         this.txsData,
         monthData.getMonthYear()
       );
-      printGainLoss(symbolProfits, totalGainLoss);
+      printer.printGainLoss(symbolProfits, totalGainLoss);
       console.log('\n');
     });
   }
