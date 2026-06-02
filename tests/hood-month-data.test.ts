@@ -46,14 +46,7 @@ describe('HoodMonthData', () => {
     });
 
     it('should throw error for invalid month/year formats', () => {
-      const invalidFormats = [
-        '13/2024',
-        '0/2024',
-        '1/24',
-        '1-2024',
-        'abc',
-        ''
-      ];
+      const invalidFormats = ['13/2024', '0/2024', '1/24', '1-2024', 'abc', ''];
 
       invalidFormats.forEach((format) => {
         expect(() => new HoodMonthData(format, sampleData)).toThrow();

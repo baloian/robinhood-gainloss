@@ -43,8 +43,7 @@ export default class RobinhoodGainLoss {
   private warnedUnmatchedSells = new Set<string>();
 
   constructor(inputDir?: string) {
-    this.inputDir =
-      inputDir ?? path.resolve(__dirname, '../../input');
+    this.inputDir = inputDir ?? path.resolve(__dirname, '../../input');
   }
 
   async run(): Promise<void> {
@@ -73,7 +72,7 @@ export default class RobinhoodGainLoss {
         monthData.getMonthYear()
       );
       printGainLoss(symbolProfits, totalGainLoss);
-      console.log('\n\n\n\n\n');
+      console.log('\n');
     });
   }
 

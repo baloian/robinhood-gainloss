@@ -104,9 +104,7 @@ export function isMonthYearLessOrEqual(date1: string, date2: string): boolean {
 export function csvFileNumericSortKey(filePath: string): number {
   const baseName = path.basename(filePath, path.extname(filePath));
   if (!/^\d+$/.test(baseName)) {
-    throw new Error(
-      `CSV filename must be a number (e.g. 1.csv), got: ${path.basename(filePath)}`
-    );
+    throw new Error(`CSV filename must be a number (e.g. 1.csv), got: ${path.basename(filePath)}`);
   }
   return Number(baseName);
 }
@@ -130,8 +128,7 @@ export function effectiveTradeDate(trade: HoodTradeTy): Date {
  */
 export function sortTradesByProcessDate(rows: HoodTradeTy[]): HoodTradeTy[] {
   return [...rows].sort((a, b) => {
-    const activityDiff =
-      effectiveTradeDate(a).getTime() - effectiveTradeDate(b).getTime();
+    const activityDiff = effectiveTradeDate(a).getTime() - effectiveTradeDate(b).getTime();
     if (activityDiff !== 0) return activityDiff;
     if (a.trans_code === 'Buy' && b.trans_code === 'Sell') return -1;
     if (a.trans_code === 'Sell' && b.trans_code === 'Buy') return 1;
@@ -190,8 +187,7 @@ export function getTradesByMonth(rows: HoodTradeTy[], month: string): HoodTradeT
   const normalizedMonth = normalizeMonthYear(month);
   return rows.filter(
     (row) =>
-      row.process_date &&
-      isMonthYearLessOrEqual(dateToMonthYear(row.process_date), normalizedMonth)
+      row.process_date && isMonthYearLessOrEqual(dateToMonthYear(row.process_date), normalizedMonth)
   );
 }
 

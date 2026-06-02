@@ -1,6 +1,6 @@
 import { HoodTradeTy, MetaDataTy } from '../types';
 import { dateToMonthYear, formatToUSD, normalizeMonthYear, numberToMonth } from './utils';
-import { printWithDots } from './print';
+import { printBuySellTable, printMonthHeadline, printRow } from './print';
 
 export interface HoodMonthData {
   monthYear: string;
@@ -81,43 +81,32 @@ export class HoodMonthData implements HoodMonthData {
 
   printMetadata(): void {
     const md: MetaDataTy = this.getMetadata();
-    if (md.dividend) printWithDots('Dividend', `${formatToUSD(md.dividend)}`);
-    if (md.interest) printWithDots('Interest', `${formatToUSD(md.interest)}`);
-    if (md.fees) printWithDots('Fees', `${formatToUSD(md.fees)}`);
-    if (md.deposit) printWithDots('Deposit', `${formatToUSD(md.deposit)}`);
-    if (md.withdrawal) printWithDots('Withdrawal', `${formatToUSD(md.withdrawal)}`);
-    if (md.benefit) printWithDots('Benefit', `${formatToUSD(md.benefit)}`);
-    if (md.acats) printWithDots('ACATS Transfer', `${formatToUSD(md.acats)}`);
+    const rows: [string, number][] = [
+      ['Dividend', md.dividend],
+      ['Interest', md.interest],
+      ['Fees', md.fees],
+      ['Deposit', md.deposit],
+      ['Withdrawal', md.withdrawal],
+      ['Benefit', md.benefit],
+      ['ACATS Transfer', md.acats]
+    ];
+    const hasMetadata = rows.some(([, amount]) => amount !== 0);
+    if (!hasMetadata) return;
+
+    rows.forEach(([label, amount]) => {
+      if (amount) printRow(label, formatToUSD(amount), { useDots: true });
+    });
     console.log('');
   }
 
   printBuySellTxs(): void {
     const txs: HoodTradeTy[] = this.getBuySellTxs();
     if (!txs.length) return;
-    const headers = ['Trade Date', 'Symbol', 'Side', 'Qty', 'Price', 'Amount'];
-    const headerRow = headers.map((header) => header.padEnd(10)).join(' | ');
-    const separator = headers.map(() => '----------').join('-|-');
-
-    console.log(headerRow);
-    console.log(separator);
-
-    txs.reverse().forEach((tx) => {
-      const rowString = [
-        tx.process_date.padEnd(10),
-        tx.symbol.padEnd(10),
-        (tx.trans_code === 'Buy' ? 'BUY' : 'SELL').padEnd(10),
-        tx.quantity.toString().padEnd(10),
-        formatToUSD(tx.price).padEnd(10),
-        formatToUSD(tx.amount).padEnd(10)
-      ].join(' | ');
-      console.log(rowString);
-    });
-    console.log('\n');
+    printBuySellTable([...txs].reverse());
   }
 
   printHeadline(): void {
     const d = this.monthYear.split('/');
-    printWithDots(`### ${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`, '', '#');
-    console.log('');
+    printMonthHeadline(`${numberToMonth(Number(d[0]))} ${d[1]} Monthly Statement`);
   }
 }
