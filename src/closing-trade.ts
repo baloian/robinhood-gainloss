@@ -7,30 +7,7 @@ import {
   parseRobinhoodDate
 } from './utils';
 
-export interface ClosingTrade {
-  symbol: string;
-  buyQty: number;
-  sellQty: number;
-  buyProcessDate: string;
-  sellProcessDate: string;
-  buyActivityDate: string;
-  sellActivityDate: string;
-  buyPrice: number;
-  sellPrice: number;
-  profit: number;
-  profitPct: number;
-  investment: number;
-
-  isLongTerm(): boolean;
-  getHoldingTimeMs(): number;
-  getProfit(): number;
-  getProfitPct(): number;
-  getSymbol(): string;
-  getInvestment(): number;
-  getData(): ClosingTrade;
-}
-
-export class ClosingTrade implements ClosingTrade {
+export class ClosingTrade {
   symbol: string;
   buyQty: number;
   sellQty: number;

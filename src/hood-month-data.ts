@@ -2,20 +2,7 @@ import { HoodTradeTy, MetaDataTy } from '../types';
 import { dateToMonthYear, formatToUSD, normalizeMonthYear, numberToMonth } from './utils';
 import { printBuySellTable, printMonthHeadline, printRow } from './print';
 
-export interface HoodMonthData {
-  monthYear: string;
-  data: HoodTradeTy[];
-
-  getMonthYear(): string;
-  getData(): HoodTradeTy[];
-  getMetadata(): MetaDataTy;
-  printMetadata(): void;
-  getBuySellTxs(): HoodTradeTy[];
-  printBuySellTxs(): void;
-  printHeadline(): void;
-}
-
-export class HoodMonthData implements HoodMonthData {
+export class HoodMonthData {
   monthYear: string;
   /**
    * Contains both current month data and previous months' data.

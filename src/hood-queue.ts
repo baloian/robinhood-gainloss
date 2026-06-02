@@ -3,18 +3,7 @@ import { HoodTradeTy } from '../types';
 
 type HoodQueueData = { [key: string]: LinkedList<HoodTradeTy> };
 
-export interface HoodQueue {
-  push(symbol: string, trade: HoodTradeTy): void;
-  pop(symbol: string): HoodTradeTy | undefined;
-  front(symbol: string): HoodTradeTy | undefined;
-  getData(): HoodQueueData;
-  forEach(callback: (symbol: string, list: LinkedList<HoodTradeTy>) => void): void;
-  getQty(symbol: string): number;
-  size(): number;
-  isEmpty(symbol: string): boolean;
-}
-
-export class HoodQueue implements HoodQueue {
+export class HoodQueue {
   private data: HoodQueueData = {};
 
   push(symbol: string, trade: HoodTradeTy): void {
