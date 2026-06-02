@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "csv-parser": "^3.2.1",
-    "fs": "^0.0.1-security",
     "typescript-ds-lib": "^0.4.9"
   },
   "devDependencies": {
